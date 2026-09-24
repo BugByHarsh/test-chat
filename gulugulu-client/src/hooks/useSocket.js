@@ -14,7 +14,12 @@ export function useSocket() {
 
     const S = useChat.getState;
 
-    const onConnect = () => S().setConnected(true);
+    const onConnect = () => {
+      S().setConnected(true);
+      if (localStorage.getItem("gulugulu_age_confirmed") === "1") {
+        socket.emit("confirm_age");
+      }
+    };
 
     const onDisconnect = (reason) => {
       S().setConnected(false);
