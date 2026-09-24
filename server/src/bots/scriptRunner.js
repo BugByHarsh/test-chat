@@ -81,7 +81,12 @@ function chooseNextIntent(state) {
     if (intent === "location") return !state.facts?.location;
     return true;
   });
-  const pool = missing.length ? missing : candidates;
+
+  // Keep the bot focused on the kind of information someone would
+  // actually look for in a quick anonymous match: age and location.
+  // Name comes after those, rather than turning the chat into a questionnaire.
+  const focused = ["age", "location"].filter((intent) => missing.includes(intent));
+  const pool = focused.length ? focused : missing.length ? missing : candidates;
   const fresh = pool.filter((intent) => !state.askedIntents.has(intent));
   const finalPool = fresh.length ? fresh : pool;
   return finalPool[Math.floor(Math.random() * finalPool.length)] || "age";
@@ -118,6 +123,16 @@ export function nextReply(state, text) {
   const directIntent = intents.find((intent) => script.intents?.[intent]);
   if (directIntent) {
     state.intentHistory.push(directIntent);
+    // Gender is already established by the opener or the user's answer.
+    // Do not repeat "f/f haha" or similar filler; move straight to the
+    // next useful question.
+    if (directIntent === "gender") {
+      const opening = nextOpening(state);
+      return opening
+        ? { ...opening, learnedInfo }
+        : { reply: null, source: "intent", intent: directIntent, learnedInfo };
+    }
+
     const cfg = script.intents[directIntent];
     const reply = pickLine(cfg.replies, state.usedLines);
     if (reply) {
@@ -131,16 +146,11 @@ export function nextReply(state, text) {
   }
 
   if (learnedInfo) {
-    const acknowledgement = pickLine(script.acknowledgements, state.usedLines);
+    // If the user gave useful information ("M", "23 Delhi", etc.),
+    // respond with the next relevant question instead of "nice/ohh/haha".
     const opening = nextOpening(state);
-    if (acknowledgement) {
-      return { reply: acknowledgement, source: "signal", learnedInfo: true, followUp: opening?.reply || null };
-    }
     if (opening) return { ...opening, learnedInfo: true };
   }
-
-  const filler = pickLine(script.fillers, state.usedLines);
-  if (filler) return { reply: filler, source: "filler" };
 
   return nextOpening(state);
 }
