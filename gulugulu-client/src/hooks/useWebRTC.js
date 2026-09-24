@@ -5,11 +5,22 @@ import { useChat } from "../store/chatStore";
 const ICE_SERVERS = [
   { urls: "stun:stun.l.google.com:19302" },
   { urls: "stun:stun1.l.google.com:19302" },
+  ...(import.meta.env.VITE_TURN_URLS
+    ? [{
+        urls: import.meta.env.VITE_TURN_URLS.split(",").map((v) => v.trim()).filter(Boolean),
+        username: import.meta.env.VITE_TURN_USERNAME || undefined,
+        credential: import.meta.env.VITE_TURN_CREDENTIAL || undefined,
+      }]
+    : []),
 ];
+
+const ICE_RESTART_DELAY_MS = 1500;
 
 export function useWebRTC() {
   const pcRef = useRef(null);
   const pendingIce = useRef([]);
+  const iceRestartedRef = useRef(false);
+  const failureHandledRef = useRef(false);
   const {
     status, mode, role, localStream,
     setRemoteStream, setIceState, showToast,
@@ -25,19 +36,17 @@ export function useWebRTC() {
 
       try {
         pc.getSenders().forEach((sender) => {
-          try {
-            pc.removeTrack(sender);
-          } catch {}
+          try { pc.removeTrack(sender); } catch {}
         });
       } catch {}
 
-      try {
-        pc.close();
-      } catch {}
+      try { pc.close(); } catch {}
     }
 
     pcRef.current = null;
     pendingIce.current = [];
+    iceRestartedRef.current = false;
+    failureHandledRef.current = false;
     setRemoteStream(null);
     setIceState("new");
   }, [setRemoteStream, setIceState]);
@@ -59,19 +68,38 @@ export function useWebRTC() {
       if (stream) setRemoteStream(stream);
     };
 
+    const fail = () => {
+      if (failureHandledRef.current) return;
+      failureHandledRef.current = true;
+      showToast("Video connection failed. Skipping…", "error");
+      socket.emit("skip");
+    };
+
     pc.oniceconnectionstatechange = () => {
       const s = pc.iceConnectionState;
       setIceState(s);
-      if (s === "failed") {
-        showToast("Connection failed. Skipping…", "error");
-        socket.emit("skip");
+
+      if ((s === "disconnected" || s === "failed") && role === "caller" && !iceRestartedRef.current) {
+        iceRestartedRef.current = true;
+        setTimeout(async () => {
+          if (pcRef.current !== pc || pc.connectionState === "closed") return;
+          try {
+            pc.restartIce?.();
+            const offer = await pc.createOffer({ iceRestart: true });
+            await pc.setLocalDescription(offer);
+            socket.emit("webrtc_offer", { sdp: pc.localDescription });
+            failureHandledRef.current = false;
+          } catch {
+            fail();
+          }
+        }, ICE_RESTART_DELAY_MS);
+      } else if (s === "failed") {
+        fail();
       }
     };
 
     pc.onconnectionstatechange = () => {
-      if (pc.connectionState === "failed") {
-        showToast("Peer connection failed.", "error");
-      }
+      if (pc.connectionState === "failed") fail();
     };
 
     if (localStream) {
@@ -80,7 +108,7 @@ export function useWebRTC() {
 
     pcRef.current = pc;
     return pc;
-  }, [localStream, setRemoteStream, setIceState, showToast]);
+  }, [localStream, role, setRemoteStream, setIceState, showToast]);
 
   const flushIce = useCallback(async (pc) => {
     if (!pc.remoteDescription) return;
