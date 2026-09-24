@@ -1,7 +1,7 @@
 import { config } from "../config.js";
 import { SCRIPTS } from "./scripts.js";
 import { createBotState, pushTimer, clearBotTimers } from "./botSession.js";
-import { nextOpening, nextReply } from "./scriptRunner.js";
+import { nextOpening, nextGenderOpening, nextReply } from "./scriptRunner.js";
 import { createSession, deleteSession, botCount, humanCount } from "../sessions.js";
 
 const activeBots = new Map();
@@ -67,7 +67,7 @@ export function startBot({ sessionId, emit, onExit }) {
     state,
     setTimeout(() => {
       if (state.exited) return;
-      const opening = nextOpening(state);
+      const opening = nextGenderOpening(state);
       if (opening?.reply) emit(opening.reply);
     }, rand(700, 1600))
   );
