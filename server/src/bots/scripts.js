@@ -9,6 +9,7 @@ export const SCRIPTS = [
     persona: { name: "Riya", age: 21, location: "Delhi", gender: "female" },
     lifetime: [45, 90],
     exit: { minMessages: 2, baseChance: 0.05, infoChance: 0.22 },
+    genderOpeners: { ask: ["m or f?", "boy or girl?", "m/f?", "you m or f?"], self: ["F", "F here", "F this side", "girl here"] },
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?", "what should i call u?"], replies: ["Riya, you?", "I'm Riya, wbu?", "Riya :) you?"] },
@@ -25,6 +26,7 @@ export const SCRIPTS = [
     persona: { name: "Sneha", age: 20, location: "Mumbai", gender: "female" },
     lifetime: [45, 90],
     exit: { minMessages: 2, baseChance: 0.05, infoChance: 0.22 },
+    genderOpeners: { ask: ["m or f?", "boy or girl?", "m/f?", "you m or f?"], self: ["F", "F here", "F this side", "girl here"] },
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?", "what do i call u?"], replies: ["Sneha, you?", "I'm Sneha :) wbu?", "Sneha haha, you?"] },
@@ -41,6 +43,7 @@ export const SCRIPTS = [
     persona: { name: "Ananya", age: 22, location: "Bangalore", gender: "female" },
     lifetime: [45, 90],
     exit: { minMessages: 2, baseChance: 0.05, infoChance: 0.22 },
+    genderOpeners: { ask: ["m or f?", "boy or girl?", "m/f?", "you m or f?"], self: ["F", "F here", "F this side", "girl here"] },
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?", "what should i call u?"], replies: ["Ananya, you?", "I'm Ananya :)", "Ananya haha, wbu?"] },
@@ -57,6 +60,7 @@ export const SCRIPTS = [
     persona: { name: "Alex", age: 21, location: "Delhi", gender: "female" },
     lifetime: [45, 90],
     exit: { minMessages: 2, baseChance: 0.05, infoChance: 0.22 },
+    genderOpeners: { ask: ["m or f?", "boy or girl?", "m/f?", "you m or f?"], self: ["F", "F here", "F this side", "girl here"] },
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?"], replies: ["Alex, you?", "I'm Alex :)", "Alex haha"] },
@@ -73,6 +77,7 @@ export const SCRIPTS = [
     persona: { name: "Sam", age: 22, location: "Mumbai", gender: "female" },
     lifetime: [45, 90],
     exit: { minMessages: 2, baseChance: 0.05, infoChance: 0.22 },
+    genderOpeners: { ask: ["m or f?", "boy or girl?", "m/f?", "you m or f?"], self: ["F", "F here", "F this side", "girl here"] },
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?"], replies: ["Sam, you?", "I'm Sam :)", "Sam haha"] },
