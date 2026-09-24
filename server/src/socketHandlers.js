@@ -15,6 +15,10 @@ import { inc } from "./metrics.js";
 
 const MAX_REPORT_FRAME_BYTES = 700_000;
 
+export function canStartSearch(session) {
+  return !!session?.ageConfirmed;
+}
+
 export function registerHandlers(io, socket) {
   const session = getBySocket(socket.id);
   if (!session) return;
@@ -26,7 +30,7 @@ export function registerHandlers(io, socket) {
   });
 
   socket.on("find_partner", ({ mode, interests } = {}) => {
-    if (!session.ageConfirmed) {
+    if (!canStartSearch(session)) {
       socket.emit("error", {
         code: "AGE_REQUIRED",
         message: "You must confirm that you are 18 or older.",
