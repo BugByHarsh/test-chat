@@ -7,7 +7,7 @@ function normalize(text) {
 }
 
 const INTENTS = {
-  greeting: [/^(hi|hii|hey|heyy|hello|yo|sup|wassup)\??$/, /^(what'?s up|whats up)\??$/],
+  greeting: [/^(hi|hii|hey|heyy|hello|yo|sup|wassup)\??$/, /^(what s up|whats up)\??$/],
   name: [/\b(name|ur name|your name)\b/, /\bwhat should i call (you|u)\b/, /\bwho are you\b/],
   age: [/\bage\b/, /\bhow old\b/, /\bhow old r u\b/, /\bhow old are u\b/, /\byour age\b/, /\bur age\b/, /\bwhat age\b/, /\bwhich age\b/, /\b(?:are|r|r u|you|u) (?:18|19|20|21|22|23|24|25|26|27|28|29|30)\b/],
   location: [/\bwhere (?:are|r) (?:you|u) from\b/, /\bwhere (?:you|u) from\b/, /\bfrom where\b/, /\bwhere from\b/, /\bwhich city\b/, /\bwhat city\b/, /\bcity\b/, /\bcountry\b/, /\bwhich country\b/, /\bwhat country\b/, /\bwhere do (?:you|u) live\b/, /\bwhere (?:are|r) (?:you|u)\b/, /\b(?:u|you) from\b/, /^from\??$/],
@@ -44,11 +44,16 @@ export function detectIntent(text) {
 export function extractSignals(text) {
   const normalized = normalize(text);
   const signals = {};
+
   const age = normalized.match(AGE_RE);
   if (age) signals.age = Number(age[1]);
 
-  const gender = normalized.match(GENDER_RE);
-  if (gender) signals.gender = gender[1].toLowerCase() === "f" ? "female" : "male";
+  // Do not treat "m or f?" as a male answer. Compact forms like
+  // "F23", "F Delhi", "M here", and "21 M" are still recognized.
+  if (!/^(m|f)\s+or\s+(m|f)\??$/.test(normalized)) {
+    const gender = normalized.match(GENDER_RE);
+    if (gender) signals.gender = gender[1].toLowerCase() === "f" ? "female" : "male";
+  }
 
   const words = normalized.split(/\s+/);
   const location = KNOWN_LOCATIONS.find((place) => words.includes(place));
@@ -115,12 +120,7 @@ export function nextReply(state, text) {
     const acknowledgement = pickLine(script.acknowledgements, state.usedLines);
     const opening = nextOpening(state);
     if (acknowledgement) {
-      return {
-        reply: acknowledgement,
-        source: "signal",
-        learnedInfo: true,
-        followUp: opening?.reply || null,
-      };
+      return { reply: acknowledgement, source: "signal", learnedInfo: true, followUp: opening?.reply || null };
     }
     if (opening) return { ...opening, learnedInfo: true };
   }
