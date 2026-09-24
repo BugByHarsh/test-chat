@@ -103,13 +103,18 @@ export function botOnUserMessage({ sessionId, text, emit }) {
         );
       }
 
-      // Randomly leave after enough conversation. Learning age/location/gender
-      // increases the chance, but there is never an exit message.
+      // Random exit is influenced by the conversation. Short, one-word
+      // replies make the bot more likely to leave; real engagement makes it
+      // more likely to continue. There is never an exit message.
       const exitConfig = state.script.exit;
       if (state.userMessageCount >= (exitConfig?.minMessages || 2)) {
-        const chance = result.learnedInfo
+        let chance = result.learnedInfo
           ? (exitConfig?.infoChance ?? 0.2)
           : (exitConfig?.baseChance ?? 0.05);
+
+        if (state.shortReplyStreak >= 2) chance += 0.18;
+        if (state.chemistryScore >= 3) chance -= 0.08;
+        chance = Math.max(0.02, Math.min(0.45, chance));
 
         if (Math.random() < chance) {
           pushTimer(
