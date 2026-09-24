@@ -224,7 +224,8 @@ function factKnown(state, intent) {
 function chooseNextIntent(state) {
   const candidates = Object.keys(state.script.intents || {})
     .filter((intent) => intent !== "greeting")
-    .filter((intent) => !factKnown(state, intent));
+    .filter((intent) => !factKnown(state, intent))
+    .filter((intent) => !state.askedIntents.has(intent));
 
   if (!candidates.length) return null;
 
@@ -232,8 +233,8 @@ function chooseNextIntent(state) {
   // This avoids the old name -> age -> location questionnaire feel.
   const priority =
     state.chemistryScore >= 2
-      ? ["age", "location", "lookingFor", "interests", "work", "name", "gender"]
-      : ["age", "location", "lookingFor", "interests", "work", "gender", "name"];
+      ? ["age", "location", "lookingFor", "interests", "work", "chemistry", "name", "gender"]
+      : ["age", "location", "lookingFor", "interests", "work", "chemistry", "gender", "name"];
 
   const available = priority.filter((intent) => candidates.includes(intent));
   if (!available.length) return candidates[Math.floor(Math.random() * candidates.length)];
