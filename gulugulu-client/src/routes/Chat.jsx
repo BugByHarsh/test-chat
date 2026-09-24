@@ -70,14 +70,18 @@ export default function Chat() {
     clearTimeout(skipTimerRef.current);
     setConfirmSkip(false);
 
-    socketApi.skip();
-
     if (mode !== "text") {
       webrtc.teardown();
     }
 
-    beginSearch();
+    socketApi.skip();
   };
+
+  useEffect(() => {
+    const handleSkipComplete = () => beginSearch();
+    window.addEventListener("gulugulu:skip-complete", handleSkipComplete);
+    return () => window.removeEventListener("gulugulu:skip-complete", handleSkipComplete);
+  }, [mode]);
 
   const onSkip = () => {
     if (!confirmSkip) {
