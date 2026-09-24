@@ -150,8 +150,7 @@ export function extractSignals(text) {
   if (
     /\b(relationship|dating|date|girlfriend|boyfriend|serious|friends|friendship|chat|talk|meet people|someone)\b/.test(
       normalized
-    ) &&
-    !detectIntents(normalized).includes("lookingFor")
+    )
   ) {
     if (/\b(relationship|dating|date|girlfriend|boyfriend|serious)\b/.test(normalized)) {
       signals.lookingFor = "dating";
