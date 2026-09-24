@@ -20,7 +20,4 @@ export const config = {
   banReportThreshold: num("BAN_REPORT_THRESHOLD", 3),
   banDurationMs: num("BAN_DURATION_MS", 24 * 60 * 60 * 1000),
   maxMessageLen: num("MAX_MESSAGE_LEN", 500),
-  turnUrls: (process.env.TURN_URLS || "").split(",").map((v) => v.trim()).filter(Boolean),
-  turnUsername: process.env.TURN_USERNAME || "",
-  turnCredential: process.env.TURN_CREDENTIAL || "",
 };
