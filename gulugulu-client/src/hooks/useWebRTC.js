@@ -18,15 +18,24 @@ export function useWebRTC() {
   const teardown = useCallback(() => {
     const pc = pcRef.current;
     if (pc) {
-      try {
-        pc.getSenders().forEach((s) => s.track && s.track.stop && s.track.stop());
-      } catch {}
       pc.onicecandidate = null;
       pc.ontrack = null;
       pc.oniceconnectionstatechange = null;
       pc.onconnectionstatechange = null;
-      pc.close();
+
+      try {
+        pc.getSenders().forEach((sender) => {
+          try {
+            pc.removeTrack(sender);
+          } catch {}
+        });
+      } catch {}
+
+      try {
+        pc.close();
+      } catch {}
     }
+
     pcRef.current = null;
     pendingIce.current = [];
     setRemoteStream(null);
