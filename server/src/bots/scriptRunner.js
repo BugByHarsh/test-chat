@@ -58,6 +58,7 @@ export function extractSignals(text) {
     const candidate = normalized.replace(/^(my name is|i am|im|i'm|name is)\s+/, "").trim();
     if (candidate && candidate.split(/\s+/).length <= 3 && !/\d/.test(candidate)) signals.name = candidate;
   }
+
   return signals;
 }
 
@@ -92,6 +93,7 @@ export function nextReply(state, text) {
   const script = state.script;
   const intents = detectIntents(text);
   const signals = extractSignals(text);
+  const learnedInfo = Object.keys(signals).length > 0;
   remember(state, signals);
 
   const directIntent = intents.find((intent) => script.intents?.[intent]);
@@ -99,15 +101,32 @@ export function nextReply(state, text) {
     state.intentHistory.push(directIntent);
     const cfg = script.intents[directIntent];
     const reply = pickLine(cfg.replies, state.usedLines);
-    if (reply) return { reply, source: "intent", intent: directIntent, learnedInfo: Object.keys(signals).length > 0 };
+    if (reply) {
+      let followUp = null;
+      if (learnedInfo) {
+        const opening = nextOpening(state);
+        followUp = opening?.reply || null;
+      }
+      return { reply, source: "intent", intent: directIntent, learnedInfo, followUp };
+    }
   }
 
-  if (Object.keys(signals).length > 0) {
+  if (learnedInfo) {
     const acknowledgement = pickLine(script.acknowledgements, state.usedLines);
-    if (acknowledgement) return { reply: acknowledgement, source: "signal", learnedInfo: true, nextIntent: chooseNextIntent(state) };
+    const opening = nextOpening(state);
+    if (acknowledgement) {
+      return {
+        reply: acknowledgement,
+        source: "signal",
+        learnedInfo: true,
+        followUp: opening?.reply || null,
+      };
+    }
+    if (opening) return { ...opening, learnedInfo: true };
   }
 
   const filler = pickLine(script.fillers, state.usedLines);
-  if (filler) return { reply: filler, source: "filler", nextIntent: chooseNextIntent(state) };
+  if (filler) return { reply: filler, source: "filler" };
+
   return nextOpening(state);
 }
