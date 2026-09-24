@@ -278,10 +278,8 @@ function finalizeBotMatch(io, room, a, b) {
     emit: (text) => {
       io.to(a.session.socketId).emit("message", { text, ts: Date.now() });
     },
-    onExit: (reason, exitLine) => {
-      if (exitLine) {
-        io.to(a.session.socketId).emit("message", { text: exitLine, ts: Date.now() });
-      }
+    onExit: (reason) => {
+      // Bots never send a goodbye/exit message.
       const human = getSession(a.session.id);
       if (human) {
         human.state = "idle";
