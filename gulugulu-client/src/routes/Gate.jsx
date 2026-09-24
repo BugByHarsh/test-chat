@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useChat } from "../store/chatStore";
+import { socket } from "../lib/socket";
 
 const MODE_LABELS = {
   text: { label: "Text", icon: "💬" },
@@ -27,6 +28,15 @@ export default function Gate() {
     if (!ok) return;
 
     setMode(initialMode);
+
+    const confirmAge = () => socket.emit("confirm_age");
+    if (socket.connected) {
+      confirmAge();
+    } else {
+      socket.connect();
+      socket.once("connect", confirmAge);
+    }
+
     nav("/chat");
   };
 
