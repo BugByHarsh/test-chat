@@ -28,6 +28,10 @@ export const SCRIPTS = [
         questions: ["what do u do?", "study or work?", "what are u studying?"],
         replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
       },
+      chemistry: {
+        questions: ["what kind of person do u like?", "what's your vibe?", "what kinda person are u?"],
+        replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
+      },
     },
     acknowledgements: ["ohh", "haha", "nicee", "oh okay", "gotcha"],
     fillers: ["ohh", "haha", "hmm", "nice"],
@@ -56,6 +60,10 @@ export const SCRIPTS = [
       work: {
         questions: ["what do u do?", "study or work?", "what are u studying?"],
         replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
+      chemistry: {
+        questions: ["what kind of person do u like?", "what's your vibe?", "what kinda person are u?"],
+        replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
     acknowledgements: ["ohh", "okay", "nicee", "haha", "gotcha"],
@@ -86,6 +94,10 @@ export const SCRIPTS = [
         questions: ["what do u do?", "study or work?", "what are u studying?"],
         replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
       },
+      chemistry: {
+        questions: ["what kind of person do u like?", "what's your vibe?", "what kinda person are u?"],
+        replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
+      },
     },
     acknowledgements: ["hmm", "ohh", "okay", "nice"],
     fillers: ["hmm", "ohh", "okay"],
@@ -115,6 +127,10 @@ export const SCRIPTS = [
         questions: ["what do u do?", "study or work?", "what are u studying?"],
         replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
       },
+      chemistry: {
+        questions: ["what kind of person do u like?", "what's your vibe?", "what kinda person are u?"],
+        replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
+      },
     },
     acknowledgements: ["hm", "oh", "okay", "nice"],
     fillers: ["hm", "oh", "okay"],
@@ -143,6 +159,10 @@ export const SCRIPTS = [
       work: {
         questions: ["what do u do?", "study or work?", "what are u studying?"],
         replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
+      chemistry: {
+        questions: ["what kind of person do u like?", "what's your vibe?", "what kinda person are u?"],
+        replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
     acknowledgements: ["hm", "ohh", "nice", "okay"],
