@@ -86,7 +86,7 @@ const INTENTS = {
   ],
 };
 
-const AGE_RE = /(?:^|\s|[^a-z])(1[89]|[2-9]\d)(?:\s*(?:yo|y\/o|years?))?(?=\s|$|[^a-z])/i;
+const AGE_RE = /(?:^|\s|[^a-z])(?:[fm]\s*)?(1[89]|[2-9]\d)(?:\s*(?:yo|y\/o|years?))?(?=\s|$|[^a-z])/i;
 const GENDER_RE = /(?:^|[\s,])([fm])(?=\d|\s|$|[,?.!])/i;
 const KNOWN_LOCATIONS = [
   "delhi","mumbai","bangalore","bengaluru","kolkata","chennai","hyderabad",
@@ -256,6 +256,7 @@ export function nextOpening(state) {
   if (!intent) return null;
 
   state.askedIntents.add(intent);
+  state.lastQuestionIntent = intent;
   const reply = pickLine(state.script.intents?.[intent]?.questions, state.usedLines);
 
   return reply ? { reply, source: "question", intent } : null;
@@ -297,6 +298,14 @@ export function nextReply(state, text) {
   updateChemistry(state, text, signals);
 
   const directIntent = intents.find((intent) => script.intents?.[intent]);
+  const reciprocal = /^(wbu|hbu|you\??|and you\??|what about you\??)$/.test(normalize(text));
+
+  // "wbu?" means answer the topic the bot just asked about instead of
+  // throwing a new question at the user.
+  if (!directIntent && reciprocal && state.lastQuestionIntent) {
+    const direct = answerDirectIntent(state, state.lastQuestionIntent);
+    if (direct) return direct;
+  }
 
   if (directIntent) {
     state.intentHistory.push(directIntent);
