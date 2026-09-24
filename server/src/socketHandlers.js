@@ -183,6 +183,7 @@ export function registerHandlers(io, socket) {
       return;
     }
     closeRoom(io, session, "skipped");
+    socket.emit("skip_complete");
     inc("skips");
   });
 
