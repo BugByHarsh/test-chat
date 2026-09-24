@@ -13,14 +13,27 @@ import { checkMessage, addReport } from "./moderation.js";
 import { relayRTC } from "./signaling.js";
 import { inc } from "./metrics.js";
 
+const MAX_REPORT_FRAME_BYTES = 700_000;
+
 export function registerHandlers(io, socket) {
   const session = getBySocket(socket.id);
   if (!session) return;
 
   const S = (id) => getSession(id);
 
-  // FIND
+  socket.on("confirm_age", () => {
+    session.ageConfirmed = true;
+  });
+
   socket.on("find_partner", ({ mode, interests } = {}) => {
+    if (!session.ageConfirmed) {
+      socket.emit("error", {
+        code: "AGE_REQUIRED",
+        message: "You must confirm that you are 18 or older.",
+      });
+      return;
+    }
+
     if (!["text", "voice", "video"].includes(mode)) mode = "text";
     if (!Array.isArray(interests)) interests = [];
     interests = interests.filter((i) => typeof i === "string").slice(0, 5);
@@ -71,7 +84,6 @@ export function registerHandlers(io, socket) {
     );
   });
 
-  // CANCEL
   socket.on("cancel_search", () => {
     if (session.state !== "searching") return;
     removeFromQueue(session.id);
@@ -80,7 +92,6 @@ export function registerHandlers(io, socket) {
     socket.emit("error", { code: "CANCELLED", message: "Search cancelled." });
   });
 
-  // MESSAGE
   socket.on("message", ({ text } = {}) => {
     if (session.state !== "chatting" || !session.roomId) return;
     if (typeof text !== "string") return;
@@ -134,7 +145,6 @@ export function registerHandlers(io, socket) {
     inc("messagesSent");
   });
 
-  // TYPING
   socket.on("typing", ({ isTyping } = {}) => {
     if (session.state !== "chatting" || !session.roomId) return;
     const room = getRoom(session.roomId);
@@ -146,7 +156,21 @@ export function registerHandlers(io, socket) {
     io.to(partnerSession.socketId).emit("partner_typing", { isTyping: !!isTyping });
   });
 
-  // SKIP
+  socket.on("video_reveal", () => {
+    if (session.state !== "chatting" || !session.roomId || session.mode !== "video") return;
+
+    const room = getRoom(session.roomId);
+    if (!room) return;
+
+    const partner = getPartner(room, session.id);
+    if (!partner) return;
+
+    const partnerSession = S(partner.sessionId);
+    if (!partnerSession || isBot(partnerSession) || partnerSession.mode !== "video") return;
+
+    io.to(partnerSession.socketId).emit("video_reveal");
+  });
+
   socket.on("skip", () => {
     if (session.state !== "chatting" || !session.roomId) return;
     const rl = checkSkipCooldown(session, config.skipCooldownMs);
@@ -162,7 +186,6 @@ export function registerHandlers(io, socket) {
     inc("skips");
   });
 
-  // REPORT
   socket.on("report", ({ reason, frame } = {}) => {
     if (session.state !== "chatting" || !session.roomId) return;
     const room = getRoom(session.roomId);
@@ -171,6 +194,15 @@ export function registerHandlers(io, socket) {
     if (!partner) return;
     const partnerSession = S(partner.sessionId);
     if (!partnerSession || isBot(partnerSession)) return;
+
+    if (
+      frame !== undefined &&
+      (typeof frame !== "string" ||
+        frame.length > MAX_REPORT_FRAME_BYTES ||
+        !frame.startsWith("data:image/"))
+    ) {
+      frame = undefined;
+    }
 
     const result = addReport({
       reporterHash: session.ipHash,
@@ -192,7 +224,6 @@ export function registerHandlers(io, socket) {
     inc("reports");
   });
 
-  // WEBRTC
   socket.on("webrtc_offer", ({ sdp } = {}) =>
     relayRTC(io, session, "webrtc_offer", { sdp })
   );
@@ -203,7 +234,6 @@ export function registerHandlers(io, socket) {
     relayRTC(io, session, "webrtc_ice", { candidate })
   );
 
-  // DISCONNECT
   socket.on("disconnect", () => {
     clearHoldTimer(session.id);
     removeFromQueue(session.id);
