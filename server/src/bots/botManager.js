@@ -77,23 +77,39 @@ export function startBot({ sessionId, emit, onExit }) {
 
 /**
  * The ONLY entry point for a bot reply.
- * Fires synchronously when the human's message arrives.
- * Every user message → exactly one bot reply.
+ * Every user message → at most one bot reply.
  */
 export function botOnUserMessage({ sessionId, text, emit }) {
   const state = activeBots.get(sessionId);
   if (!state || state.exited) return;
 
-  const result = nextReply(state, text);
-  if (!result) return;
+  state.userMessageCount = (state.userMessageCount || 0) + 1;
 
-  pushTimer(
-    state,
-    setTimeout(() => {
-      if (state.exited) return;
-      emit(result.reply);
-    }, 1000)
-  );
+  const result = nextReply(state, text);
+
+  if (result) {
+    pushTimer(
+      state,
+      setTimeout(() => {
+        if (state.exited) return;
+        emit(result.reply);
+      }, 1000)
+    );
+  }
+
+  const exitConfig = state.script.abruptExit;
+  if (
+    exitConfig &&
+    Array.isArray(exitConfig.afterMessages) &&
+    exitConfig.afterMessages.includes(state.userMessageCount)
+  ) {
+    pushTimer(
+      state,
+      setTimeout(() => {
+        if (!state.exited) doExit(sessionId);
+      }, 1400)
+    );
+  }
 }
 
 function doExit(sessionId) {
@@ -101,7 +117,14 @@ function doExit(sessionId) {
   if (!state || state.exited) return;
   state.exited = true;
 
-  const exitLine = state.script.exits[Math.floor(Math.random() * state.script.exits.length)];
+  let exitLine = null;
+  if (Array.isArray(state.script.exits) && state.script.exits.length) {
+    exitLine =
+      state.script.exits[
+        Math.floor(Math.random() * state.script.exits.length)
+      ];
+  }
+
   pushTimer(
     state,
     setTimeout(() => {
