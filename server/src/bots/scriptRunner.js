@@ -84,6 +84,14 @@ const INTENTS = {
     /\bcollege\b/,
     /\bschool\b/,
   ],
+  chemistry: [
+    /\bwhat kind of person do you like\b/,
+    /\bwhat kinda person do you like\b/,
+    /\bwhat's your vibe\b/,
+    /\bwhats your vibe\b/,
+    /\bwhat kind of person are you\b/,
+    /\bwhat kinda person are you\b/,
+  ],
 };
 
 const AGE_RE = /(?:^|\s|[^a-z])(?:[fm]\s*)?(1[89]|[2-9]\d)(?:\s*(?:yo|y\/o|years?))?(?=\s|$|[^a-z])/i;
