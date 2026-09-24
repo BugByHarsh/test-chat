@@ -47,6 +47,8 @@ export function useSocket() {
 
     const onTyping = (p) => S().setPartnerTyping(p.isTyping);
 
+    const onVideoReveal = () => S().setRevealRemote(true);
+
     const onLeft = (p) => {
       const labels = {
         skipped: "Stranger skipped.",
@@ -84,6 +86,7 @@ export function useSocket() {
     socket.on("matched", onMatched);
     socket.on("message", onMessage);
     socket.on("partner_typing", onTyping);
+    socket.on("video_reveal", onVideoReveal);
     socket.on("partner_left", onLeft);
     socket.on("online_count", onOnline);
     socket.on("error", onErr);
@@ -97,6 +100,7 @@ export function useSocket() {
       socket.off("matched", onMatched);
       socket.off("message", onMessage);
       socket.off("partner_typing", onTyping);
+      socket.off("video_reveal", onVideoReveal);
       socket.off("partner_left", onLeft);
       socket.off("online_count", onOnline);
       socket.off("error", onErr);
