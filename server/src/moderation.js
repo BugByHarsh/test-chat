@@ -9,7 +9,7 @@ const LINK_RE = /(https?:\/\/|www\.)\S+/i;
 const MINOR_WORDS = ["underage", "13yo", "14yo", "15yo", "16yo", "17yo"];
 
 const bans = new Map(); // ipHash -> { until, reason }
-const reports = []; // { reporterHash, reportedHash, reason, ts, snapshot }
+const reports = []; // { reporterHash, reportedHash, reason, ts, snapshot, frame }
 
 export function isBanned(ipHash) {
   const b = bans.get(ipHash);
@@ -45,8 +45,15 @@ export function checkMessage(text) {
   return { ok: true };
 }
 
-export function addReport({ reporterHash, reportedHash, reason, snapshot }) {
-  const r = { reporterHash, reportedHash, reason, snapshot: snapshot || [], ts: Date.now() };
+export function addReport({ reporterHash, reportedHash, reason, snapshot, frame }) {
+  const r = {
+    reporterHash,
+    reportedHash,
+    reason,
+    snapshot: snapshot || [],
+    frame: typeof frame === "string" ? frame : null,
+    ts: Date.now(),
+  };
   reports.push(r);
   if (reports.length > 1000) reports.shift();
 
