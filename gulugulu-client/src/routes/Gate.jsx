@@ -29,7 +29,10 @@ export default function Gate() {
 
     setMode(initialMode);
 
-    const confirmAge = () => socket.emit("confirm_age");
+    const confirmAge = () => {
+      localStorage.setItem("gulugulu_age_confirmed", "1");
+      socket.emit("confirm_age");
+    };
     if (socket.connected) {
       confirmAge();
     } else {
