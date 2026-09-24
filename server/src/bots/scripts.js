@@ -17,6 +17,18 @@ export const SCRIPTS = [
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?", "gender?", "f?"], replies: ["f haha", "girl :)", "f, you?"] },
       location: { questions: ["from?", "where u from?", "where from?", "city?", "which city?", "u from where?"], replies: ["Delhi, you?", "I'm from Delhi, wbu?", "Delhi :) you?"] },
     },
+      lookingFor: {
+        questions: ["what u looking for?", "here for dating or just chat?", "looking for someone?"],
+        replies: ["just seeing if i click with someone", "someone around my age tbh", "just here to meet someone interesting"],
+      },
+      interests: {
+        questions: ["what are u into?", "music?", "what do u like?", "what do u do for fun?"],
+        replies: ["music mostly, wbu?", "bit of everything, you?", "gaming and music mostly, wbu?"],
+      },
+      work: {
+        questions: ["what do u do?", "study or work?", "what are u studying?"],
+        replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
     acknowledgements: ["ohh", "haha", "nicee", "oh okay", "gotcha"],
     fillers: ["ohh", "haha", "hmm", "nice"],
   },
@@ -34,6 +46,18 @@ export const SCRIPTS = [
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?", "f?"], replies: ["f", "girl haha", "f :) you?"] },
       location: { questions: ["from?", "where u from?", "city?", "which city?", "where from?"], replies: ["Mumbai, you?", "I'm from Mumbai :)", "Mumbai haha, wbu?"] },
     },
+      lookingFor: {
+        questions: ["what u looking for?", "here for dating or just chat?", "looking for someone?"],
+        replies: ["just seeing if i click with someone", "someone around my age tbh", "just here to meet someone interesting"],
+      },
+      interests: {
+        questions: ["what are u into?", "music?", "what do u like?", "what do u do for fun?"],
+        replies: ["music mostly, wbu?", "bit of everything, you?", "gaming and music mostly, wbu?"],
+      },
+      work: {
+        questions: ["what do u do?", "study or work?", "what are u studying?"],
+        replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
     acknowledgements: ["ohh", "okay", "nicee", "haha", "gotcha"],
     fillers: ["ohh", "okay", "nicee", "haha"],
   },
@@ -51,6 +75,18 @@ export const SCRIPTS = [
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?", "gender?"], replies: ["f", "girl :)", "f haha"] },
       location: { questions: ["from?", "where u from?", "city?", "which city?", "where from?"], replies: ["Bangalore, you?", "I'm from Bangalore", "Bangalore :) wbu?"] },
     },
+      lookingFor: {
+        questions: ["what u looking for?", "here for dating or just chat?", "looking for someone?"],
+        replies: ["just seeing if i click with someone", "someone around my age tbh", "just here to meet someone interesting"],
+      },
+      interests: {
+        questions: ["what are u into?", "music?", "what do u like?", "what do u do for fun?"],
+        replies: ["music mostly, wbu?", "bit of everything, you?", "gaming and music mostly, wbu?"],
+      },
+      work: {
+        questions: ["what do u do?", "study or work?", "what are u studying?"],
+        replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
     acknowledgements: ["hmm", "ohh", "okay", "nice"],
     fillers: ["hmm", "ohh", "okay"],
   },
@@ -68,6 +104,18 @@ export const SCRIPTS = [
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?"], replies: ["f", "girl haha", "f :)"] },
       location: { questions: ["from?", "where u from?", "city?", "where from?"], replies: ["Delhi, you?", "Delhi :)"] },
     },
+      lookingFor: {
+        questions: ["what u looking for?", "here for dating or just chat?", "looking for someone?"],
+        replies: ["just seeing if i click with someone", "someone around my age tbh", "just here to meet someone interesting"],
+      },
+      interests: {
+        questions: ["what are u into?", "music?", "what do u like?", "what do u do for fun?"],
+        replies: ["music mostly, wbu?", "bit of everything, you?", "gaming and music mostly, wbu?"],
+      },
+      work: {
+        questions: ["what do u do?", "study or work?", "what are u studying?"],
+        replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
     acknowledgements: ["hm", "oh", "okay", "nice"],
     fillers: ["hm", "oh", "okay"],
   },
@@ -85,6 +133,18 @@ export const SCRIPTS = [
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?"], replies: ["f", "girl", "f :)"] },
       location: { questions: ["from?", "where u from?", "city?", "where from?"], replies: ["Mumbai, you?", "Mumbai :) wbu?"] },
     },
+      lookingFor: {
+        questions: ["what u looking for?", "here for dating or just chat?", "looking for someone?"],
+        replies: ["just seeing if i click with someone", "someone around my age tbh", "just here to meet someone interesting"],
+      },
+      interests: {
+        questions: ["what are u into?", "music?", "what do u like?", "what do u do for fun?"],
+        replies: ["music mostly, wbu?", "bit of everything, you?", "gaming and music mostly, wbu?"],
+      },
+      work: {
+        questions: ["what do u do?", "study or work?", "what are u studying?"],
+        replies: ["college rn, you?", "still studying haha, wbu?", "work/study?"],
+      },
     acknowledgements: ["hm", "ohh", "nice", "okay"],
     fillers: ["hm", "ohh", "nice"],
   },
