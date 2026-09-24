@@ -10,6 +10,8 @@ export function createBotState(script, sessionId) {
     nudgeCount: 0,
     nudgeTimer: null,
     userMessageCount: 0,
+    shortReplyStreak: 0,
+    chemistryScore: 0,
     lifetimeMs: 0,
     timers: [],
     exited: false,
