@@ -94,6 +94,20 @@ export function nextOpening(state) {
   return reply ? { reply, source: "question", intent } : null;
 }
 
+export function nextGenderOpening(state) {
+  const gender = state.script.persona?.gender;
+  const cfg = state.script.genderOpeners;
+  if (!cfg) return nextOpening(state);
+
+  const ask = pickLine(cfg.ask, state.usedLines);
+  const self = pickLine(cfg.self, state.usedLines);
+
+  // Start with a gender-related message every time, but vary whether
+  // the bot asks first or casually reveals "F" itself.
+  const reply = Math.random() < 0.5 ? ask : self;
+  return reply ? { reply, source: "gender_opening", intent: "gender" } : nextOpening(state);
+}
+
 export function nextReply(state, text) {
   const script = state.script;
   const intents = detectIntents(text);
