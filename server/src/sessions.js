@@ -4,9 +4,8 @@ import { config } from "./config.js";
 const sessions = new Map(); // sessionId -> session
 const bySocket = new Map(); // socketId -> sessionId
 
-let counter = 0;
 function sid() {
-  return `s_${Date.now().toString(36)}_${(++counter).toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  return `s_${crypto.randomUUID()}`;
 }
 
 export function hashIP(ip) {
@@ -31,7 +30,7 @@ export function createSession({ socketId, ipHash }) {
     msgTimestamps: [],
     lastSkipAt: 0,
     strikes: 0,
-    verified: true, // no Turnstile
+    ageConfirmed: false,
     createdAt: Date.now(),
     bot: null, // bot state when this session is a bot
   };
