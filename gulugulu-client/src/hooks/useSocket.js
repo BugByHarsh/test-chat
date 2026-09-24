@@ -48,6 +48,7 @@ export function useSocket() {
     const onTyping = (p) => S().setPartnerTyping(p.isTyping);
 
     const onVideoReveal = () => S().setRevealRemote(true);
+    const onSkipComplete = () => window.dispatchEvent(new CustomEvent("gulugulu:skip-complete"));
 
     const onLeft = (p) => {
       const labels = {
@@ -87,6 +88,7 @@ export function useSocket() {
     socket.on("message", onMessage);
     socket.on("partner_typing", onTyping);
     socket.on("video_reveal", onVideoReveal);
+    socket.on("skip_complete", onSkipComplete);
     socket.on("partner_left", onLeft);
     socket.on("online_count", onOnline);
     socket.on("error", onErr);
@@ -101,6 +103,7 @@ export function useSocket() {
       socket.off("message", onMessage);
       socket.off("partner_typing", onTyping);
       socket.off("video_reveal", onVideoReveal);
+      socket.off("skip_complete", onSkipComplete);
       socket.off("partner_left", onLeft);
       socket.off("online_count", onOnline);
       socket.off("error", onErr);
