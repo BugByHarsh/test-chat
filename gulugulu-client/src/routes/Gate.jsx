@@ -168,7 +168,7 @@ export default function Gate() {
 
             {/* Privacy note */}
             <p className="mt-4 text-[11px] leading-5 text-center text-slate-400">
-              Chats are not logged. Video uses peer-to-peer connection.
+              Chats are not permanently stored. Recent messages may be temporarily included in reports. Video uses a peer-to-peer connection.
             </p>
           </div>
 
