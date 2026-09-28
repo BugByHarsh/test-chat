@@ -126,7 +126,7 @@ export default function Chat() {
   };
 
   const onNewClick = () => {
-    if (localStorage.getItem("gulugulu_age_confirmed") !== "1") {
+    if (!hasValidConsent()) {
       navigate("/", { replace: true });
       return;
     }
