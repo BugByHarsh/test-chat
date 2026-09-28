@@ -34,12 +34,7 @@ export default function MessageList() {
     const handleViewportResize = () => {
       if (locked) return;
 
-      // The keyboard can resize the visual viewport without immediately
-      // updating the scroll container's layout. Wait for the new layout,
-      // then pin the newest message to the bottom.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => scrollToBottom());
-      });
+      requestAnimationFrame(() => scrollToBottom());
     };
 
     window.visualViewport?.addEventListener("resize", handleViewportResize);
