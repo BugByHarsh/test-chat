@@ -54,7 +54,7 @@ export default function Gate() {
     }
 
     setMode(initialMode);
-    nav("/chat", { replace: true });
+    nav(`/chat?mode=${initialMode}`, { replace: true });
   }, [initialMode, nav, setMode]);
 
   const go = () => {
@@ -73,7 +73,7 @@ export default function Gate() {
       socket.once("connect", confirmAge);
     }
 
-    nav("/chat");
+    nav(`/chat?mode=${initialMode}`);
   };
 
   useEffect(() => {
