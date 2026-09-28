@@ -36,25 +36,6 @@ export default function Chat() {
 
   useEffect(() => {
     document.title = "Gulugulu";
-
-    // On mobile browsers the on-screen keyboard changes the visual viewport,
-    // but the layout viewport can remain unchanged. Keep the app height tied
-    // to the actual visible area so the message list ends above the keyboard.
-    const updateViewportHeight = () => {
-      const height = window.visualViewport?.height || window.innerHeight;
-      document.documentElement.style.setProperty("--gulugulu-vh", `${height}px`);
-    };
-
-    updateViewportHeight();
-    window.visualViewport?.addEventListener("resize", updateViewportHeight);
-    window.visualViewport?.addEventListener("scroll", updateViewportHeight);
-    window.addEventListener("resize", updateViewportHeight);
-
-    return () => {
-      window.visualViewport?.removeEventListener("resize", updateViewportHeight);
-      window.visualViewport?.removeEventListener("scroll", updateViewportHeight);
-      window.removeEventListener("resize", updateViewportHeight);
-    };
   }, []);
 
   const beginSearch = async () => {
@@ -164,8 +145,7 @@ export default function Chat() {
       mediaPermission === "unavailable");
 
   return (
-    <div className="min-h-0 flex flex-col bg-white text-slate-800 relative overflow-hidden overscroll-none"
-        style={{ height: "var(--gulugulu-vh, 100dvh)", maxHeight: "var(--gulugulu-vh, 100dvh)" }}>
+    <div className="h-[100dvh] max-h-[100dvh] min-h-0 flex flex-col bg-white text-slate-800 relative overflow-hidden overscroll-none">
       <ConnectionBanner />
 
       <StatusBar />
