@@ -5,10 +5,17 @@ function num(key, def) {
   return v === undefined ? def : Number(v);
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+const ipHashSalt = process.env.IP_HASH_SALT;
+
+if (isProduction && !ipHashSalt) {
+  throw new Error("IP_HASH_SALT is required in production.");
+}
+
 export const config = {
   port: num("PORT", 3001),
   clientOrigin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
-  ipHashSalt: process.env.IP_HASH_SALT || "dev-salt-change-me",
+  ipHashSalt: ipHashSalt || "dev-only-salt",
   holdTimerMs: num("HOLD_TIMER_MS", 2500),
   interestFallbackMs: num("INTEREST_FALLBACK_MS", 5000),
   botMaxRatio: num("BOT_MAX_RATIO", 0.3),
