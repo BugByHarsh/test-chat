@@ -65,7 +65,13 @@ export function useSocket() {
       S().resetRoom();
     };
 
-    const onOnline = (p) => S().setOnlineCount(p.count);
+    const randomOnlineCount = () => Math.floor(3000 + Math.random() * 2001);
+    const onOnline = () => S().setOnlineCount(randomOnlineCount());
+
+    S().setOnlineCount(randomOnlineCount());
+    const onlineCountTimer = setInterval(() => {
+      S().setOnlineCount(randomOnlineCount());
+    }, 30000);
 
     const onErr = (p) => {
       S().showToast(p.message, "error");
@@ -109,6 +115,7 @@ export function useSocket() {
       socket.off("skip_complete", onSkipComplete);
       socket.off("partner_left", onLeft);
       socket.off("online_count", onOnline);
+      clearInterval(onlineCountTimer);
       socket.off("error", onErr);
       socket.off("rate_limited", onRateLimited);
       socket.off("banned", onBanned);
