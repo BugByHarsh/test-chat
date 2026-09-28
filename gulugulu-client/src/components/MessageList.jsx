@@ -5,6 +5,11 @@ export default function MessageList() {
   const { messages, partnerTyping } = useChat();
   const ref = useRef(null);
   const [locked, setLocked] = useState(false);
+  const scrollToBottom = (behavior = "auto") => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior });
+  };
 
   useEffect(() => {
     if (locked) return;
@@ -12,7 +17,9 @@ export default function MessageList() {
     const el = ref.current;
     if (!el) return;
 
-    el.scrollTop = el.scrollHeight;
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
   }, [messages.length, partnerTyping, locked]);
 
   const onScroll = () => {
@@ -23,8 +30,26 @@ export default function MessageList() {
     setLocked(!nearBottom);
   };
 
+  useEffect(() => {
+    const handleViewportResize = () => {
+      if (!locked) scrollToBottom();
+    };
+
+    window.visualViewport?.addEventListener("resize", handleViewportResize);
+    window.visualViewport?.addEventListener("scroll", handleViewportResize);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", handleViewportResize);
+      window.visualViewport?.removeEventListener("scroll", handleViewportResize);
+    };
+  }, [locked]);
+
   return (
-    <div ref={ref} onScroll={onScroll} className="h-full overflow-y-auto bg-white px-2 sm:px-3 py-2 space-y-2">
+    <div
+      ref={ref}
+      onScroll={onScroll}
+      className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain bg-white px-2 sm:px-3 py-2 space-y-2"
+    >
       {messages.map((m) => {
         if (m.from === "system") {
           return (
