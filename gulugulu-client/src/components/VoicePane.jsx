@@ -1,22 +1,49 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "../store/chatStore";
 
 export default function VoicePane() {
   const { remoteStream, micOn, iceState, status } = useChat();
   const remoteAudioRef = useRef(null);
+  const audioContextRef = useRef(null);
   const [level, setLevel] = useState(0);
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
 
-  useEffect(() => {
-    if (remoteAudioRef.current && remoteStream) {
-      remoteAudioRef.current.srcObject = remoteStream;
-      remoteAudioRef.current.play().catch(() => {});
+  const playRemoteAudio = useCallback(async () => {
+    const el = remoteAudioRef.current;
+    if (!el || !remoteStream) return false;
+
+    try {
+      const ctx = audioContextRef.current;
+      if (ctx?.state === "suspended") {
+        await ctx.resume();
+      }
+
+      await el.play();
+      setPlaybackBlocked(false);
+      return true;
+    } catch (error) {
+      if (error?.name === "NotAllowedError") {
+        setPlaybackBlocked(true);
+      } else {
+        console.warn("[Voice] Remote audio playback failed", error);
+      }
+      return false;
     }
   }, [remoteStream]);
+
+  useEffect(() => {
+    if (!remoteAudioRef.current || !remoteStream) return;
+
+    remoteAudioRef.current.srcObject = remoteStream;
+    void playRemoteAudio();
+  }, [remoteStream, playRemoteAudio]);
 
   useEffect(() => {
     if (!remoteStream) return;
 
     const ctx = new AudioContext();
+    audioContextRef.current = ctx;
+
     const src = ctx.createMediaStreamSource(remoteStream);
     const analyser = ctx.createAnalyser();
 
@@ -45,8 +72,20 @@ export default function VoicePane() {
       try {
         src.disconnect();
       } catch {}
-      ctx.close();
+      try {
+        ctx.close();
+      } catch {}
+      if (audioContextRef.current === ctx) {
+        audioContextRef.current = null;
+      }
     };
+  }, [remoteStream]);
+
+  useEffect(() => {
+    if (!remoteStream) {
+      setPlaybackBlocked(false);
+      setLevel(0);
+    }
   }, [remoteStream]);
 
   const speaking = level > 0.08;
@@ -74,7 +113,7 @@ export default function VoicePane() {
         </div>
       </div>
 
-      <div className="relative text-center space-y-1">
+      <div className="relative text-center space-y-2">
         <p className="text-sm text-slate-300">
           {remoteStream
             ? speaking
@@ -82,6 +121,16 @@ export default function VoicePane() {
               : "Stranger"
             : "Connecting audio…"}
         </p>
+
+        {playbackBlocked && remoteStream && (
+          <button
+            type="button"
+            onClick={() => void playRemoteAudio()}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800"
+          >
+            🔊 Tap to enable audio
+          </button>
+        )}
 
         {status === "chatting" && (
           <p className="text-[10px] text-slate-500">{iceState}</p>
