@@ -13,7 +13,7 @@ export const SCRIPTS = [
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?", "what should i call u?"], replies: ["Riya, you?", "I'm Riya, wbu?", "Riya :) you?"] },
-      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "what's ur age?", "u 21?"], replies: ["21, you?", "I'm 21 haha, you?", "21 :) wbu?"] },
+      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "what's ur age?", "age btw?"], replies: ["21, you?", "I'm 21 haha, you?", "21 :) wbu?"] },
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?", "gender?", "f?"], replies: ["f haha", "girl :)", "f, you?"] },
       location: { questions: ["from?", "where u from?", "where from?", "city?", "which city?", "u from where?"], replies: ["Delhi, you?", "I'm from Delhi, wbu?", "Delhi :) you?"] },
       lookingFor: {
@@ -46,7 +46,7 @@ export const SCRIPTS = [
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?", "what do i call u?"], replies: ["Sneha, you?", "I'm Sneha :) wbu?", "Sneha haha, you?"] },
-      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "u 20?"], replies: ["20, wbu?", "I'm 20 haha, you?", "20 :) you?"] },
+      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "age btw?", "what age?"], replies: ["20, wbu?", "I'm 20 haha, you?", "20 :) you?"] },
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?", "f?"], replies: ["f", "girl haha", "f :) you?"] },
       location: { questions: ["from?", "where u from?", "city?", "which city?", "where from?"], replies: ["Mumbai, you?", "I'm from Mumbai :)", "Mumbai haha, wbu?"] },
       lookingFor: {
@@ -79,7 +79,7 @@ export const SCRIPTS = [
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?", "what should i call u?"], replies: ["Ananya, you?", "I'm Ananya :)", "Ananya haha, wbu?"] },
-      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "u 22?"], replies: ["22, you?", "I'm 22 haha", "22 :) wbu?"] },
+      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "what age?", "age btw?"], replies: ["22, you?", "I'm 22 haha", "22 :) wbu?"] },
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?", "gender?"], replies: ["f", "girl :)", "f haha"] },
       location: { questions: ["from?", "where u from?", "city?", "which city?", "where from?"], replies: ["Bangalore, you?", "I'm from Bangalore", "Bangalore :) wbu?"] },
       lookingFor: {
@@ -112,7 +112,7 @@ export const SCRIPTS = [
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?"], replies: ["Alex, you?", "I'm Alex :)", "Alex haha"] },
-      age: { questions: ["age?", "your age?", "how old?", "u 21?"], replies: ["21, you?", "I'm 21", "21 :)"] },
+      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "age btw?", "what age?"], replies: ["21, you?", "I'm 21", "21 :)"] },
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?"], replies: ["f", "girl haha", "f :)"] },
       location: { questions: ["from?", "where u from?", "city?", "where from?"], replies: ["Delhi, you?", "Delhi :)"] },
       lookingFor: {
@@ -145,7 +145,7 @@ export const SCRIPTS = [
     intents: {
       ...common,
       name: { questions: ["name?", "ur name?", "what's ur name?"], replies: ["Sam, you?", "I'm Sam :)", "Sam haha"] },
-      age: { questions: ["age?", "your age?", "how old?", "u 22?"], replies: ["22, wbu?", "I'm 22", "22 :) you?"] },
+      age: { questions: ["age?", "your age?", "how old?", "how old r u?", "what age?", "age btw?"], replies: ["22, wbu?", "I'm 22", "22 :) you?"] },
       gender: { questions: ["m or f?", "boy or girl?", "u a girl?"], replies: ["f", "girl", "f :)"] },
       location: { questions: ["from?", "where u from?", "city?", "where from?"], replies: ["Mumbai, you?", "Mumbai :) wbu?"] },
       lookingFor: {
