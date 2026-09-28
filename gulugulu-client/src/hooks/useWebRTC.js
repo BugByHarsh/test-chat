@@ -36,6 +36,8 @@ export function useWebRTC() {
     setRemoteStream,
     setIceState,
     showToast,
+    updateWebRTCDebug,
+    resetWebRTCDebug,
   } = useChat();
 
   useEffect(() => {
@@ -76,6 +78,14 @@ export function useWebRTC() {
 
     pcRef.current = null;
     pendingIce.current = [];
+    updateWebRTCDebug({
+      pcState: "closed",
+      connectionState: "closed",
+      signalingState: "closed",
+      role: roleRef.current,
+      remoteTracks: [],
+      lastEvent: "pc: teardown",
+    });
     remoteStreamRef.current = null;
     iceRestartedRef.current = false;
     failureHandledRef.current = false;
@@ -86,6 +96,8 @@ export function useWebRTC() {
   const createPC = useCallback(() => {
     if (pcRef.current) return pcRef.current;
 
+    resetWebRTCDebug();
+
     const pc = new RTCPeerConnection({
       iceServers: ICE_SERVERS,
       iceCandidatePoolSize: 4,
@@ -93,6 +105,7 @@ export function useWebRTC() {
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
+        updateWebRTCDebug({ iceSent: useChat.getState().webrtcDebug.iceSent + 1, lastEvent: "ICE: candidate sent" });
         socket.emit("webrtc_ice", {
           candidate: event.candidate.toJSON(),
         });
@@ -102,6 +115,7 @@ export function useWebRTC() {
     pc.onicecandidateerror = (event) => {
       // Keep this diagnostic-only. A single STUN/TURN candidate error does not
       // necessarily mean the peer connection will fail.
+      updateWebRTCDebug({ iceErrors: useChat.getState().webrtcDebug.iceErrors + 1, lastError: `ICE candidate error ${event.errorCode || "unknown"}: ${event.errorText || ""}`, lastEvent: "ICE: candidate error" });
       if (event.errorCode && event.errorCode >= 700 && event.errorCode !== 701) {
         console.warn("[WebRTC] ICE candidate error", {
           code: event.errorCode,
@@ -123,6 +137,10 @@ export function useWebRTC() {
 
       remoteStreamRef.current = stream;
       setRemoteStream(stream);
+      updateWebRTCDebug({
+        remoteTracks: stream.getTracks().map((t) => `${t.kind}:${t.readyState}:${t.enabled}`),
+        lastEvent: `track: ${event.track.kind} received`,
+      });
     };
 
     const fail = (message = "Call connection failed. Skipping…") => {
@@ -135,6 +153,7 @@ export function useWebRTC() {
     pc.oniceconnectionstatechange = () => {
       const state = pc.iceConnectionState;
       setIceState(state);
+      updateWebRTCDebug({ iceState: state, connectionState: pc.connectionState, signalingState: pc.signalingState, lastEvent: `ICE: ${state}` });
 
       if (state === "connected" || state === "completed") {
         iceRestartedRef.current = false;
@@ -186,6 +205,7 @@ export function useWebRTC() {
 
     pc.onconnectionstatechange = () => {
       const state = pc.connectionState;
+      updateWebRTCDebug({ connectionState: state, iceState: pc.iceConnectionState, signalingState: pc.signalingState, lastEvent: `PC: ${state}` });
 
       if (state === "connected") {
         setIceState(pc.iceConnectionState);
@@ -207,6 +227,7 @@ export function useWebRTC() {
     };
 
     pc.onsignalingstatechange = () => {
+      updateWebRTCDebug({ signalingState: pc.signalingState, connectionState: pc.connectionState, lastEvent: `signaling: ${pc.signalingState}` });
       if (pc.signalingState === "closed") {
         setIceState("closed");
       }
@@ -219,6 +240,15 @@ export function useWebRTC() {
     }
 
     pcRef.current = pc;
+    updateWebRTCDebug({
+      pcState: "created",
+      connectionState: pc.connectionState,
+      iceState: pc.iceConnectionState,
+      signalingState: pc.signalingState,
+      role: roleRef.current,
+      localTracks: localStream?.getTracks().map((t) => `${t.kind}:${t.readyState}:${t.enabled}`) || [],
+      lastEvent: "pc: created",
+    });
     return pc;
   }, [
     clearRestartTimer,
@@ -226,6 +256,8 @@ export function useWebRTC() {
     setRemoteStream,
     setIceState,
     showToast,
+    updateWebRTCDebug,
+    resetWebRTCDebug,
   ]);
 
   const flushIce = useCallback(async (pc) => {
@@ -255,6 +287,7 @@ export function useWebRTC() {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
+      updateWebRTCDebug({ offersSent: useChat.getState().webrtcDebug.offersSent + 1, signalingState: pc.signalingState, lastEvent: "signal: offer sent" });
       socket.emit("webrtc_offer", {
         sdp: pc.localDescription,
       });
@@ -266,6 +299,7 @@ export function useWebRTC() {
 
   useEffect(() => {
     const onOffer = async ({ sdp }) => {
+      updateWebRTCDebug({ offersReceived: useChat.getState().webrtcDebug.offersReceived + 1, lastEvent: "signal: offer received" });
       if (roleRef.current !== "callee") return;
 
       const pc = pcRef.current || createPC();
@@ -286,6 +320,7 @@ export function useWebRTC() {
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
 
+        updateWebRTCDebug({ answersSent: useChat.getState().webrtcDebug.answersSent + 1, signalingState: pc.signalingState, lastEvent: "signal: answer sent" });
         socket.emit("webrtc_answer", {
           sdp: pc.localDescription,
         });
@@ -296,6 +331,7 @@ export function useWebRTC() {
     };
 
     const onAnswer = async ({ sdp }) => {
+      updateWebRTCDebug({ answersReceived: useChat.getState().webrtcDebug.answersReceived + 1, lastEvent: "signal: answer received" });
       const pc = pcRef.current;
       if (!pc || roleRef.current !== "caller") return;
 
@@ -310,6 +346,7 @@ export function useWebRTC() {
 
     const onIce = async ({ candidate }) => {
       if (!candidate) return;
+      updateWebRTCDebug({ iceReceived: useChat.getState().webrtcDebug.iceReceived + 1, lastEvent: "ICE: candidate received" });
 
       const pc = pcRef.current;
 
