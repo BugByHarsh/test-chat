@@ -32,7 +32,6 @@ export function useWebRTC() {
     status,
     mode,
     role,
-    localStream,
     setRemoteStream,
     setIceState,
     showToast,
@@ -234,9 +233,12 @@ export function useWebRTC() {
       }
     };
 
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
+    // Media is requested immediately before start(), so the hook's render-time
+    // localStream can still be stale. Read the latest stream directly from the store.
+    const currentLocalStream = useChat.getState().localStream;
+    if (currentLocalStream) {
+      currentLocalStream.getTracks().forEach((track) => {
+        pc.addTrack(track, currentLocalStream);
       });
     }
 
@@ -247,8 +249,10 @@ export function useWebRTC() {
       iceState: pc.iceConnectionState,
       signalingState: pc.signalingState,
       role: roleRef.current,
-      localTracks: localStream?.getTracks().map((t) => `${t.kind}:${t.readyState}:${t.enabled}`) || [],
-      lastEvent: "pc: created",
+      localTracks: currentLocalStream?.getTracks().map((t) => `${t.kind}:${t.readyState}:${t.enabled}`) || [],
+      lastEvent: currentLocalStream?.getTracks().length
+        ? "pc: created + local tracks"
+        : "pc: created without local tracks",
     });
     return pc;
   }, [
