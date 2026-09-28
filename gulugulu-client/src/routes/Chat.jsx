@@ -173,7 +173,7 @@ export default function Chat() {
               : "bg-white/90 border border-slate-200 text-slate-400 cursor-not-allowed"
           }`}
         >
-          !
+          Report
         </button>
 
         {isCallMode && (isChatting || isSearching) ? (
