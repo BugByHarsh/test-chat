@@ -167,10 +167,10 @@ export default function Chat() {
           onClick={openReport}
           disabled={!isChatting}
           aria-label="Report"
-          className={`absolute top-3 right-4 z-10 w-8 h-8 rounded-full text-sm font-bold transition-colors ${
+          className={`absolute top-3 left-3 z-10 rounded-full px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-100 ${
             isChatting
-              ? "bg-white border border-red-500 text-red-500 hover:bg-red-50 active:bg-red-100"
-              : "bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed"
+              ? "bg-white/95 border border-red-200 text-red-600 hover:bg-red-50 active:bg-red-100 shadow-sm backdrop-blur"
+              : "bg-white/90 border border-slate-200 text-slate-400 cursor-not-allowed"
           }`}
         >
           !
@@ -212,7 +212,7 @@ export default function Chat() {
       </div>
 
       <div
-        className="border-t border-slate-200 bg-white"
+        className="border-t border-slate-200 bg-white shadow-[0_-6px_24px_rgba(15,23,42,0.04)]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="w-full px-3 pt-3 pb-3">
@@ -220,7 +220,7 @@ export default function Chat() {
             {isChatting ? (
               <button
                 onClick={onSkip}
-                className={`w-28 shrink-0 rounded-lg font-medium text-sm transition-colors ${
+                className={`w-24 sm:w-28 shrink-0 rounded-xl font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-100 ${
                   confirmSkip
                     ? "bg-red-600 text-white hover:bg-red-700"
                     : "bg-red-500 text-white hover:bg-red-600"
@@ -235,7 +235,7 @@ export default function Chat() {
               <button
                 onClick={onNewClick}
                 disabled={isSearching}
-                className={`w-28 shrink-0 rounded-lg font-medium text-sm transition-colors ${
+                className={`w-24 sm:w-28 shrink-0 rounded-xl font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
                   isSearching
                     ? "bg-slate-100 text-slate-400 cursor-wait"
                     : "bg-blue-600 text-white hover:bg-blue-700"
