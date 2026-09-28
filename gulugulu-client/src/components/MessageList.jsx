@@ -32,7 +32,14 @@ export default function MessageList() {
 
   useEffect(() => {
     const handleViewportResize = () => {
-      if (!locked) scrollToBottom();
+      if (locked) return;
+
+      // The keyboard can resize the visual viewport without immediately
+      // updating the scroll container's layout. Wait for the new layout,
+      // then pin the newest message to the bottom.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => scrollToBottom());
+      });
     };
 
     window.visualViewport?.addEventListener("resize", handleViewportResize);
@@ -50,6 +57,7 @@ export default function MessageList() {
       onScroll={onScroll}
       className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain bg-white px-2 sm:px-3 py-2 space-y-2"
     >
+      <div className="min-h-full flex flex-col justify-end gap-2">
       {messages.map((m) => {
         if (m.from === "system") {
           return (
@@ -87,6 +95,7 @@ export default function MessageList() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
