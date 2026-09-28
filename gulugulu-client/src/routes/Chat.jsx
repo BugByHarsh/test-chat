@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../hooks/useSocket";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { useMedia } from "../hooks/useMedia";
+import { useHotkeys } from "../hooks/useHotkeys";
 import { useReconnect } from "../hooks/useReconnect";
 import { useChat } from "../store/chatStore";
 import MessageList from "../components/MessageList";
@@ -123,6 +124,17 @@ export default function Chat() {
     useChat.getState().showToast("Report sent. Thanks.", "success");
   };
 
+  useHotkeys(
+    {
+      escape: () => {
+        if (status === "chatting") {
+          onSkip();
+        }
+      },
+    },
+    [status, mode, interests, confirmSkip]
+  );
+
   useEffect(() => {
     return () => {
       clearTimeout(skipTimerRef.current);
@@ -155,13 +167,13 @@ export default function Chat() {
           onClick={openReport}
           disabled={!isChatting}
           aria-label="Report"
-          className={`absolute top-3 left-3 z-10 rounded-full px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-100 ${
+          className={`absolute top-3 right-4 z-10 w-8 h-8 rounded-full text-sm font-bold transition-colors ${
             isChatting
-              ? "bg-white/95 border border-red-200 text-red-600 hover:bg-red-50 active:bg-red-100 shadow-sm backdrop-blur"
-              : "bg-white/90 border border-slate-200 text-slate-400 cursor-not-allowed"
+              ? "bg-white border border-red-500 text-red-500 hover:bg-red-50 active:bg-red-100"
+              : "bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed"
           }`}
         >
-          Report
+          !
         </button>
 
         {isCallMode && (isChatting || isSearching) ? (
@@ -200,7 +212,7 @@ export default function Chat() {
       </div>
 
       <div
-        className="border-t border-slate-200 bg-white shadow-[0_-6px_24px_rgba(15,23,42,0.04)]"
+        className="border-t border-slate-200 bg-white"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="w-full px-3 pt-3 pb-3">
@@ -208,7 +220,7 @@ export default function Chat() {
             {isChatting ? (
               <button
                 onClick={onSkip}
-                className={`w-24 sm:w-28 shrink-0 rounded-xl font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-100 ${
+                className={`w-28 shrink-0 rounded-lg font-medium text-sm transition-colors ${
                   confirmSkip
                     ? "bg-red-600 text-white hover:bg-red-700"
                     : "bg-red-500 text-white hover:bg-red-600"
@@ -223,7 +235,7 @@ export default function Chat() {
               <button
                 onClick={onNewClick}
                 disabled={isSearching}
-                className={`w-24 sm:w-28 shrink-0 rounded-xl font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
+                className={`w-28 shrink-0 rounded-lg font-medium text-sm transition-colors ${
                   isSearching
                     ? "bg-slate-100 text-slate-400 cursor-wait"
                     : "bg-blue-600 text-white hover:bg-blue-700"
