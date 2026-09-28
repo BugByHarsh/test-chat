@@ -34,7 +34,7 @@ export default function Composer({ onSend, onTyping, disabled, placeholder }) {
         }}
         placeholder={placeholder || "Type a message…"}
         maxLength={MAX_MESSAGE_LEN}
-        className="flex-1 bg-white border border-neutral-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition disabled:opacity-50 disabled:bg-neutral-50"
+        className="flex-1 bg-white border border-neutral-200 rounded-xl px-4 py-3 text-base sm:text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition disabled:opacity-50 disabled:bg-neutral-50"
       />
       <button
         type="submit"
