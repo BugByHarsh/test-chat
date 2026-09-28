@@ -55,9 +55,9 @@ export default function Gate() {
   }, [ok]);
 
   return (
-    <div className="min-h-full flex flex-col bg-white text-slate-900">
+    <div className="min-h-full flex flex-col bg-slate-50/60 text-slate-900">
       {/* Header */}
-      <header className="w-full border-b border-slate-100">
+      <header className="w-full border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
             <span className="text-2xl leading-none transition-transform group-hover:-rotate-6">
@@ -79,10 +79,10 @@ export default function Gate() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex items-center justify-center px-5 py-8">
+      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-5 sm:py-10">
         <div className="w-full max-w-md">
           {/* Card */}
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6 sm:p-8">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 p-5 sm:p-8">
             {/* Mode */}
             <div className="flex justify-center mb-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-600">
@@ -92,11 +92,11 @@ export default function Gate() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-bold text-center tracking-tight text-slate-900">
-              Before you start
+              A quick check before you start
             </h1>
 
             <p className="mt-2 text-sm text-slate-500 text-center">
-              Two quick confirmations, then you're in.
+              Gulugulu is for adults. Confirm both items to continue.
             </p>
 
             {/* Checkboxes */}
@@ -157,7 +157,7 @@ export default function Gate() {
             <button
               disabled={!ok}
               onClick={go}
-              className={`mt-6 w-full py-3.5 rounded-lg font-semibold text-sm transition-colors ${
+              className={`mt-6 w-full py-3.5 rounded-xl font-semibold text-sm transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
                 ok
                   ? "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
@@ -184,7 +184,7 @@ export default function Gate() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-100">
+      <footer className="border-t border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-6 flex items-center justify-center gap-4 text-xs text-slate-400">
           <Link to="/terms" className="hover:text-slate-700 transition-colors">
             Terms
@@ -225,7 +225,7 @@ function CheckRow({ checked, onChange, icon, title, description }) {
         />
 
         <span
-          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors peer-focus-visible:ring-4 peer-focus-visible:ring-blue-200 ${
             checked
               ? "bg-blue-600 border-blue-600"
               : "bg-white border-slate-300"
