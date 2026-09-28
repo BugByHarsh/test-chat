@@ -42,7 +42,8 @@ export function useWebRTC() {
 
   useEffect(() => {
     roleRef.current = role;
-  }, [role]);
+    updateWebRTCDebug({ role: role || null, lastEvent: role ? `role: ${role}` : "role: none" });
+  }, [role, updateWebRTCDebug]);
 
   const clearRestartTimer = useCallback(() => {
     if (restartTimerRef.current) {
