@@ -176,7 +176,7 @@ export default function Landing() {
 
               <div className="mt-4 p-3.5 rounded-lg bg-slate-50 border border-slate-100 text-center">
                 <p className="text-xs text-slate-500">
-                  Your conversation is temporary.{" "}
+                  Your conversation is temporary and is not permanently stored.{" "}
                   <span className="font-medium text-slate-700">
                     Nothing to remember.
                   </span>
