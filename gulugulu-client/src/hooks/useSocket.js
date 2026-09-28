@@ -47,7 +47,6 @@ export function useSocket() {
         text: p.text,
         ts: p.ts,
       });
-      sounds.msg();
     };
 
     const onTyping = (p) => S().setPartnerTyping(p.isTyping);
@@ -70,7 +69,6 @@ export function useSocket() {
 
     const onErr = (p) => {
       S().showToast(p.message, "error");
-      sounds.error();
       if (S().status === "searching") S().setStatus("idle");
     };
 
