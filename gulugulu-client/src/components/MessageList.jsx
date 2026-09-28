@@ -8,32 +8,28 @@ export default function MessageList() {
 
   useEffect(() => {
     if (locked) return;
+
     const el = ref.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+
+    el.scrollTop = el.scrollHeight;
   }, [messages.length, partnerTyping, locked]);
 
   const onScroll = () => {
     const el = ref.current;
     if (!el) return;
+
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
     setLocked(!nearBottom);
   };
 
   return (
-    <div ref={ref} onScroll={onScroll} aria-label="Conversation messages" className="h-full overflow-y-auto bg-slate-50/60 px-3 sm:px-5 py-4 space-y-3">
-      {messages.length === 0 && (
-        <div className="flex h-full min-h-40 items-center justify-center">
-          <p className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs text-slate-500 shadow-sm">
-            You're connected. Say hello to start the conversation.
-          </p>
-        </div>
-      )}
-
+    <div ref={ref} onScroll={onScroll} className="h-full overflow-y-auto bg-white px-2 sm:px-3 py-2 space-y-2">
       {messages.map((m) => {
         if (m.from === "system") {
           return (
-            <div key={m.id} className="flex justify-center py-1">
-              <span className="max-w-[90%] rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-center text-[11px] leading-4 text-slate-500 shadow-sm">
+            <div key={m.id} className="flex justify-center my-3">
+              <span className="text-[11px] text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
                 {m.text}
               </span>
             </div>
@@ -41,12 +37,13 @@ export default function MessageList() {
         }
 
         const mine = m.from === "me";
+
         return (
           <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[88%] sm:max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 break-words whitespace-pre-wrap shadow-sm ${mine ? "rounded-br-md bg-blue-600 text-white" : "rounded-bl-md border border-slate-200 bg-white text-slate-800"}`}>
-              <div className={`mb-0.5 text-[10px] font-semibold uppercase tracking-wide ${mine ? "text-blue-100" : "text-slate-400"}`}>
-                {mine ? "You" : "Stranger"}
-              </div>
+            <div className={`max-w-[75%] px-2.5 py-2 text-sm break-words whitespace-pre-wrap rounded-lg ${mine ? "bg-slate-50 text-slate-700" : "bg-red-50 text-slate-700"}`}>
+              <span className={`font-bold ${mine ? "text-blue-500" : "text-red-500"}`}>
+                {mine ? "You:" : "Stranger:"}
+              </span>{" "}
               <span>{m.text}</span>
             </div>
           </div>
@@ -54,13 +51,13 @@ export default function MessageList() {
       })}
 
       {partnerTyping && (
-        <div className="flex justify-start" aria-label="Stranger is typing">
-          <div className="rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-3 shadow-sm">
-            <span className="sr-only">Stranger is typing</span>
-            <span className="inline-flex gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+        <div className="flex justify-start">
+          <div className="bg-red-50 rounded-lg px-2.5 py-2 text-sm">
+            <span className="font-bold text-red-500">Stranger:</span>{" "}
+            <span className="inline-flex gap-1 ml-1 align-middle">
+              <span className="w-1 h-1 rounded-full bg-red-300 animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1 h-1 rounded-full bg-red-300 animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1 h-1 rounded-full bg-red-300 animate-bounce" style={{ animationDelay: "300ms" }} />
             </span>
           </div>
         </div>
