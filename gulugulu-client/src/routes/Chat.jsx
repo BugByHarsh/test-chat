@@ -15,6 +15,7 @@ import ReportModal from "../components/ReportModal";
 import ConnectionBanner from "../components/ConnectionBanner";
 import PermissionPrompt from "../components/PermissionPrompt";
 import InterestInput from "../components/InterestInput";
+import CallDebugPanel from "../components/CallDebugPanel";
 
 export default function Chat() {
   const {
@@ -287,6 +288,7 @@ export default function Chat() {
       </div>
 
       <ReportModal onReport={doReport} />
+      <CallDebugPanel />
     </div>
   );
 }
