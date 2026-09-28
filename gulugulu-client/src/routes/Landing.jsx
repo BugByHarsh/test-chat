@@ -90,7 +90,7 @@ export default function Landing() {
 
               <p className="mt-6 text-base sm:text-lg leading-7 text-slate-500 max-w-xl mx-auto lg:mx-0">
                 Random conversations with real people. Text, voice, or video.
-                No signup, no profile, and no chat history.
+                No signup, no profile, and no permanent chat history.
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
