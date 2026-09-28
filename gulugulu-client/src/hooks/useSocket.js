@@ -47,10 +47,29 @@ export function useSocket() {
     };
 
     const onDisconnect = (reason) => {
-      S().setConnected(false);
-      S().updateWebRTCDebug({ lastEvent: `socket: disconnected (${reason})`, lastError: reason });
+      const state = S();
+
+      state.setConnected(false);
+      state.updateWebRTCDebug({
+        lastEvent: `socket: disconnected (${reason})`,
+        lastError: reason,
+      });
+
+      // A socket disconnect ends the current session. Do not leave the UI
+      // looking like the user is still chatting/calling while the server has
+      // already closed the room.
+      if (state.status === "chatting" || state.status === "searching") {
+        const stream = state.localStream;
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        state.resetRoom();
+        state.setLocalStream(null);
+        state.setMediaError(null);
+      }
+
       if (reason !== "io client disconnect") {
-        S().pushSystem("Connection lost. Reconnecting…");
+        state.pushSystem("Connection lost. Session ended.");
       }
     };
 
