@@ -33,11 +33,7 @@ export function useSocket() {
     const onMatched = (p) => {
       S().setMatched(p);
       sounds.match();
-      S().pushSystem(
-        p.partnerType === "bot"
-          ? "Matched with a bot (demo)."
-          : "You're now chatting with a stranger."
-      );
+      S().pushSystem("You're now chatting with a stranger.");
     };
 
     const onMessage = (p) => {
