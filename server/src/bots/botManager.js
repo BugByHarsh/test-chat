@@ -114,9 +114,9 @@ export function botOnUserMessage({ sessionId, text, emit }) {
 
         if (state.shortReplyStreak >= 2) chance += 0.18;
         if (state.chemistryScore >= 3) chance -= 0.08;
-        chance = Math.max(0.02, Math.min(0.45, chance));
+        chance = Math.max(0.05, Math.min(0.55, chance));
 
-        if (Math.random() < chance) {
+        if (state.userMessageCount >= 4 || Math.random() < chance) {
           pushTimer(
             state,
             setTimeout(() => {
