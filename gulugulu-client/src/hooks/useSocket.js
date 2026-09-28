@@ -36,8 +36,11 @@ export function useSocket() {
 
     const S = useChat.getState;
 
+    S().updateWebRTCDebug({ lastEvent: "socket: starting", updatedAt: Date.now() });
+
     const onConnect = () => {
       S().setConnected(true);
+      S().updateWebRTCDebug({ lastEvent: `socket: connected (${socket.id || "no id"})`, lastError: "" });
       if (hasValidConsent()) {
         socket.emit("confirm_age");
       }
@@ -45,6 +48,7 @@ export function useSocket() {
 
     const onDisconnect = (reason) => {
       S().setConnected(false);
+      S().updateWebRTCDebug({ lastEvent: `socket: disconnected (${reason})`, lastError: reason });
       if (reason !== "io client disconnect") {
         S().pushSystem("Connection lost. Reconnecting…");
       }
