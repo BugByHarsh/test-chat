@@ -157,6 +157,48 @@ export default function Chat() {
     (mediaPermission === "denied" ||
       mediaPermission === "unavailable");
 
+  const renderConversation = () => {
+    if (isChatting) {
+      if (mode === "video") {
+        return (
+          <div className="flex-1 min-h-0 flex flex-col">
+            <VideoPane />
+            <MessageList />
+          </div>
+        );
+      }
+
+      if (mode === "voice") {
+        return (
+          <div className="flex-1 min-h-0 flex flex-col">
+            <VoicePane />
+            <MessageList />
+          </div>
+        );
+      }
+
+      return <MessageList />;
+    }
+
+    if (isSearching) {
+      return (
+        <div className="flex-1 min-h-0 flex items-center justify-center">
+          <SearchingIndicator />
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-4">
+        <IdleHint />
+
+        <div className="w-full max-w-lg mt-7">
+          <InterestInput />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="h-[100dvh] max-h-[100dvh] min-h-0 flex flex-col bg-white text-slate-800 relative overflow-hidden overscroll-none">
       <ConnectionBanner />
@@ -177,27 +219,7 @@ export default function Chat() {
           !
         </button>
 
-        {isCallMode && (isChatting || isSearching) ? (
-          mode === "video" ? (
-            <VideoPane />
-          ) : (
-            <VoicePane />
-          )
-        ) : isChatting ? (
-          <MessageList />
-        ) : isSearching ? (
-          <div className="flex-1 min-h-0 flex items-center justify-center">
-            <SearchingIndicator />
-          </div>
-        ) : (
-          <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-4">
-            <IdleHint />
-
-            <div className="w-full max-w-lg mt-7">
-              <InterestInput />
-            </div>
-          </div>
-        )}
+        {renderConversation()}
 
         {showPermissionPrompt && (
           <PermissionPrompt
