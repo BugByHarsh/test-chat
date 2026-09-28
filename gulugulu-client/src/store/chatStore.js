@@ -23,9 +23,6 @@ export const useChat = create((set) => ({
 
   localStream: null,
   remoteStream: null,
-  revealLocal: false,
-  revealRemote: false,
-  revealRemoteRequested: false,
   mediaPermission: "prompt",
   mediaError: null,
   micOn: true,
@@ -59,9 +56,6 @@ export const useChat = create((set) => ({
       role,
       messages: [],
       partnerTyping: false,
-      revealLocal: false,
-      revealRemote: false,
-      revealRemoteRequested: false,
     }),
 
   pushMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
@@ -102,9 +96,6 @@ export const useChat = create((set) => ({
       partnerTyping: false,
       roomId: null,
       role: null,
-      revealLocal: false,
-      revealRemote: false,
-      revealRemoteRequested: false,
       iceState: "new",
     }),
     
@@ -117,9 +108,6 @@ export const useChat = create((set) => ({
       messages: [],
       partnerTyping: false,
       remoteStream: null,
-      revealLocal: false,
-      revealRemote: false,
-      revealRemoteRequested: false,
       iceState: "new",
     }),
 
