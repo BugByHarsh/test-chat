@@ -5,7 +5,7 @@ export function useMedia() {
   const streamRef = useRef(null);
   const {
     setLocalStream, setMediaPermission, setMediaError,
-    setMicOn, setCamOn, micOn, camOn,
+    setMicOn, setCamOn, updateWebRTCDebug, micOn, camOn,
   } = useChat();
 
   const request = useCallback(
@@ -14,6 +14,7 @@ export function useMedia() {
         if (!navigator.mediaDevices?.getUserMedia) {
           setMediaPermission("unavailable");
           setMediaError("Your browser does not support camera/microphone.");
+          updateWebRTCDebug({ lastError: "getUserMedia unavailable", lastEvent: "media: unavailable" });
           return null;
         }
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -28,6 +29,11 @@ export function useMedia() {
         setMediaError(null);
         setMicOn(stream.getAudioTracks().some((t) => t.enabled));
         setCamOn(stream.getVideoTracks().some((t) => t.enabled));
+        updateWebRTCDebug({
+          localTracks: stream.getTracks().map((t) => `${t.kind}:${t.readyState}:${t.enabled}`),
+          lastError: "",
+          lastEvent: `media: granted (${stream.getTracks().map((t) => t.kind).join("+")})`,
+        });
         return stream;
       } catch (e) {
         const name = e?.name || "";
@@ -44,10 +50,11 @@ export function useMedia() {
           setMediaPermission("denied");
           setMediaError(e?.message || "Could not access media.");
         }
+        updateWebRTCDebug({ lastError: `${name || "MediaError"}: ${e?.message || "Could not access media."}`, lastEvent: `media: ${name || "error"}` });
         return null;
       }
     },
-    [setLocalStream, setMediaPermission, setMediaError, setMicOn, setCamOn]
+    [setLocalStream, setMediaPermission, setMediaError, setMicOn, setCamOn, updateWebRTCDebug]
   );
 
   const stop = useCallback(() => {
