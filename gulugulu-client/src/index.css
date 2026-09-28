@@ -2,53 +2,13 @@
 
 html, body, #root { height: 100%; }
 
-html {
-  color-scheme: light;
-  scroll-behavior: smooth;
-}
-
 body {
   @apply bg-[#fafaff] text-neutral-900 antialiased;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  overscroll-behavior-y: none;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-button, a, input, textarea, select {
-  touch-action: manipulation;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: none;
-}
-
-::selection {
-  background: #dbeafe;
-  color: #0f172a;
-}
+* { -webkit-tap-highlight-color: transparent; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
