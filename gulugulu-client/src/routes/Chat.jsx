@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../hooks/useSocket";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { useMedia } from "../hooks/useMedia";
-import { useHotkeys } from "../hooks/useHotkeys";
 import { useReconnect } from "../hooks/useReconnect";
 import { useChat } from "../store/chatStore";
 import MessageList from "../components/MessageList";
@@ -124,17 +123,6 @@ export default function Chat() {
     useChat.getState().showToast("Report sent. Thanks.", "success");
   };
 
-  useHotkeys(
-    {
-      escape: () => {
-        if (status === "chatting") {
-          onSkip();
-        }
-      },
-    },
-    [status, mode, interests, confirmSkip]
-  );
-
   useEffect(() => {
     return () => {
       clearTimeout(skipTimerRef.current);
@@ -157,7 +145,7 @@ export default function Chat() {
       mediaPermission === "unavailable");
 
   return (
-    <div className="h-full flex flex-col bg-white text-slate-800 relative overflow-hidden">
+    <div className="h-[100dvh] max-h-[100dvh] min-h-0 flex flex-col bg-white text-slate-800 relative overflow-hidden overscroll-none">
       <ConnectionBanner />
 
       <StatusBar />
@@ -212,10 +200,10 @@ export default function Chat() {
       </div>
 
       <div
-        className="border-t border-slate-200 bg-white"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="shrink-0 border-t border-slate-200 bg-white"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        <div className="w-full px-3 pt-3 pb-3">
+        <div className="w-full px-3 pt-2 pb-2 sm:pt-3 sm:pb-3">
           <div className="flex gap-2">
             {isChatting ? (
               <button
