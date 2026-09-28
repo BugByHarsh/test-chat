@@ -1,14 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "../store/chatStore";
 import { socket } from "../lib/socket";
-
-function attach(el, stream) {
-  if (!el || !stream) return;
-  if (el.srcObject !== stream) {
-    el.srcObject = stream;
-    el.play().catch(() => {});
-  }
-}
 
 export default function VideoPane() {
   const {
@@ -27,15 +19,56 @@ export default function VideoPane() {
   const localRef = useRef(null);
   const remoteRef = useRef(null);
   const [remoteReady, setRemoteReady] = useState(false);
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
+
+  const playRemoteVideo = useCallback(async () => {
+    const el = remoteRef.current;
+    if (!el || !remoteStream) return false;
+
+    try {
+      await el.play();
+      setPlaybackBlocked(false);
+      return true;
+    } catch (error) {
+      if (error?.name === "NotAllowedError") {
+        setPlaybackBlocked(true);
+      } else {
+        console.warn("[Video] Remote video playback failed", error);
+      }
+      return false;
+    }
+  }, [remoteStream]);
+
+  const attach = useCallback((el, stream, { muted = false } = {}) => {
+    if (!el || !stream) return;
+
+    el.muted = muted;
+
+    if (el.srcObject !== stream) {
+      el.srcObject = stream;
+    }
+
+    void el.play().catch((error) => {
+      if (!muted && error?.name === "NotAllowedError") {
+        setPlaybackBlocked(true);
+      } else if (!muted) {
+        console.warn("[Video] Video playback failed", error);
+      }
+    });
+  }, []);
 
   useEffect(() => {
-    attach(localRef.current, localStream);
-  }, [localStream]);
+    attach(localRef.current, localStream, { muted: true });
+  }, [localStream, attach]);
 
   useEffect(() => {
     attach(remoteRef.current, remoteStream);
     setRemoteReady(!!remoteStream);
-  }, [remoteStream]);
+
+    if (!remoteStream) {
+      setPlaybackBlocked(false);
+    }
+  }, [remoteStream, attach]);
 
   const showRemoteVideo = revealRemote && remoteReady;
   const showLocalPreview = revealLocal || !remoteReady;
@@ -47,7 +80,9 @@ export default function VideoPane() {
         autoPlay
         playsInline
         data-remote="true"
-        className={`w-full h-full object-cover transition-opacity duration-200 ${showRemoteVideo ? "opacity-100" : "opacity-0"}`}
+        className={`w-full h-full object-cover transition-opacity duration-200 ${
+          showRemoteVideo ? "opacity-100" : "opacity-0"
+        }`}
       />
 
       {!showRemoteVideo && (
@@ -95,6 +130,18 @@ export default function VideoPane() {
         </div>
       )}
 
+      {showRemoteVideo && playbackBlocked && (
+        <div className="absolute inset-x-0 bottom-12 flex justify-center px-4">
+          <button
+            type="button"
+            onClick={() => void playRemoteVideo()}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium shadow-lg hover:bg-blue-700 active:bg-blue-800"
+          >
+            ▶ Tap to play video
+          </button>
+        </div>
+      )}
+
       {status === "chatting" && (
         <div className="absolute top-3 right-3 w-28 sm:w-36 aspect-[3/4] rounded-lg overflow-hidden border border-white/20 bg-slate-900 shadow-lg">
           <video
@@ -102,7 +149,9 @@ export default function VideoPane() {
             autoPlay
             playsInline
             muted
-            className={`w-full h-full object-cover transition-opacity duration-200 ${showLocalPreview && camOn ? "opacity-100" : "opacity-0"}`}
+            className={`w-full h-full object-cover transition-opacity duration-200 ${
+              showLocalPreview && camOn ? "opacity-100" : "opacity-0"
+            }`}
           />
 
           {(!showLocalPreview || !camOn) && (
