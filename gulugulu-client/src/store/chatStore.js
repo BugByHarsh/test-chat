@@ -29,6 +29,27 @@ export const useChat = create((set) => ({
   camOn: true,
   iceState: "new",
 
+  // Temporary WebRTC diagnostics. Remove after call debugging is complete.
+  webrtcDebug: {
+    pcState: "none",
+    iceState: "new",
+    signalingState: "stable",
+    connectionState: "new",
+    role: null,
+    localTracks: [],
+    remoteTracks: [],
+    offersSent: 0,
+    offersReceived: 0,
+    answersSent: 0,
+    answersReceived: 0,
+    iceSent: 0,
+    iceReceived: 0,
+    iceErrors: 0,
+    lastEvent: "not started",
+    lastError: "",
+    updatedAt: 0,
+  },
+
   setConnected: (v) =>
     set((s) => ({ connected: v, everConnected: s.everConnected || v })),
 
@@ -77,7 +98,39 @@ export const useChat = create((set) => ({
   setMediaError: (mediaError) => set({ mediaError }),
   setMicOn: (micOn) => set({ micOn }),
   setCamOn: (camOn) => set({ camOn }),
-  setIceState: (iceState) => set({ iceState }),
+  setIceState: (iceState) =>
+    set((s) => ({
+      iceState,
+      webrtcDebug: { ...s.webrtcDebug, iceState, lastEvent: `ICE: ${iceState}`, updatedAt: Date.now() },
+    })),
+
+  updateWebRTCDebug: (patch) =>
+    set((s) => ({
+      webrtcDebug: { ...s.webrtcDebug, ...patch, updatedAt: Date.now() },
+    })),
+
+  resetWebRTCDebug: () =>
+    set({
+      webrtcDebug: {
+        pcState: "none",
+        iceState: "new",
+        signalingState: "stable",
+        connectionState: "new",
+        role: null,
+        localTracks: [],
+        remoteTracks: [],
+        offersSent: 0,
+        offersReceived: 0,
+        answersSent: 0,
+        answersReceived: 0,
+        iceSent: 0,
+        iceReceived: 0,
+        iceErrors: 0,
+        lastEvent: "not started",
+        lastError: "",
+        updatedAt: Date.now(),
+      },
+    }),
 
   openReport: () => set({ reportOpen: true }),
   closeReport: () => set({ reportOpen: false }),
