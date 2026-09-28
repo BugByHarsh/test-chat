@@ -257,7 +257,6 @@ export function useWebRTC() {
     return pc;
   }, [
     clearRestartTimer,
-    localStream,
     setRemoteStream,
     setIceState,
     showToast,
