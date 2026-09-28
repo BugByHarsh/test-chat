@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSocket } from "../hooks/useSocket";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { useMedia } from "../hooks/useMedia";
@@ -50,6 +50,7 @@ export default function Chat() {
   const webrtc = useWebRTC();
   const skipTimerRef = useRef(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [confirmSkip, setConfirmSkip] = useState(false);
 
@@ -60,6 +61,13 @@ export default function Chat() {
       navigate("/", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const requestedMode = searchParams.get("mode");
+    if (requestedMode === "text" || requestedMode === "voice" || requestedMode === "video") {
+      useChat.getState().setMode(requestedMode);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     document.title = "Gulugulu";
