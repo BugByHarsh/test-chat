@@ -1,16 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "../store/chatStore";
-import { socket } from "../lib/socket";
 
 export default function VideoPane() {
   const {
     localStream,
     remoteStream,
-    revealLocal,
-    revealRemote,
-    revealRemoteRequested,
-    setRevealLocal,
-    requestRevealRemote,
     camOn,
     iceState,
     status,
@@ -70,8 +64,8 @@ export default function VideoPane() {
     }
   }, [remoteStream, attach]);
 
-  const showRemoteVideo = revealRemote && remoteReady;
-  const showLocalPreview = revealLocal || !remoteReady;
+  const showRemoteVideo = remoteReady;
+  const showLocalPreview = true;
 
   const connection = {
     new: { label: "Preparing video…", tone: "slate" },
@@ -121,29 +115,11 @@ export default function VideoPane() {
               </div>
             </div>
           ) : (
-            <div className="space-y-4 max-w-xs">
+            <div className="space-y-2 max-w-xs">
               <div className="w-16 h-16 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl">
                 👤
               </div>
-
-              <p className="text-sm text-slate-300">
-                {revealRemoteRequested
-                  ? "Reveal requested. Waiting for stranger…"
-                  : "Stranger's video is hidden."}
-              </p>
-
-              {!revealRemoteRequested && (
-                <button
-                  onClick={() => {
-                    setRevealLocal(true);
-                    requestRevealRemote();
-                    socket.emit("video_reveal");
-                  }}
-                  className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 active:bg-blue-800 transition-colors"
-                >
-                  Reveal & show mine
-                </button>
-              )}
+              <p className="text-sm text-slate-300">Waiting for stranger's camera…</p>
             </div>
           )}
         </div>
@@ -169,13 +145,13 @@ export default function VideoPane() {
             playsInline
             muted
             className={`w-full h-full object-cover transition-opacity duration-200 ${
-              showLocalPreview && camOn ? "opacity-100" : "opacity-0"
+              camOn ? "opacity-100" : "opacity-0"
             }`}
           />
 
-          {(!showLocalPreview || !camOn) && (
+          {!camOn && (
             <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-400 bg-slate-900">
-              {!camOn ? "cam off" : "hidden"}
+              cam off
             </div>
           )}
         </div>
