@@ -37,10 +37,13 @@ export default function CallDebugPanel() {
   ];
 
   return (
-    <div className="fixed right-3 bottom-3 z-[60] w-[min(92vw,380px)] text-[10px] font-mono">
+    <div
+      className="fixed right-3 z-[60] w-auto text-[10px] font-mono"
+      style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 72px)" }}
+    >
       <div className="flex flex-col items-end">
         {open && (
-          <div className="mb-2 max-h-[60vh] w-full overflow-auto rounded-lg border border-amber-400/40 bg-slate-950/95 p-3 text-slate-200 shadow-2xl">
+          <div className="mb-2 max-h-[60vh] w-[min(92vw,380px)] overflow-auto rounded-lg border border-amber-400/40 bg-slate-950/95 p-3 text-slate-200 shadow-2xl">
             <div className="mb-2 flex items-center justify-between">
               <strong className="text-amber-300">TEMP WebRTC diagnostics</strong>
               <span className="text-slate-500">remove after debugging</span>
@@ -74,10 +77,11 @@ export default function CallDebugPanel() {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="rounded-lg border border-amber-400/60 bg-slate-950/95 px-3 py-2 text-amber-300 shadow-lg"
+          aria-label="WebRTC debug"
+          title="WebRTC debug"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-amber-400/60 bg-slate-950/95 text-base shadow-lg"
         >
-          🛠 {open ? "Hide call debug" : "Call debug"}
-          <span className="ml-2 text-slate-400">{webrtcDebug.lastEvent}</span>
+          🛠
         </button>
       </div>
     </div>
