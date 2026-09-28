@@ -3,6 +3,28 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useChat } from "../store/chatStore";
 import { socket } from "../lib/socket";
 
+const CONSENT_KEY = "gulugulu_age_confirmed";
+const CONSENT_TTL_MS = 24 * 60 * 60 * 1000;
+
+function hasValidConsent() {
+  const raw = localStorage.getItem(CONSENT_KEY);
+  if (!raw) return false;
+
+  // Migrate the old permanent flag into the new 24-hour format.
+  if (raw === "1") {
+    localStorage.setItem(CONSENT_KEY, String(Date.now()));
+    return true;
+  }
+
+  const acceptedAt = Number(raw);
+  if (!Number.isFinite(acceptedAt) || Date.now() - acceptedAt >= CONSENT_TTL_MS) {
+    localStorage.removeItem(CONSENT_KEY);
+    return false;
+  }
+
+  return true;
+}
+
 const MODE_LABELS = {
   text: { label: "Text", icon: "💬" },
   voice: { label: "Voice", icon: "🎙️" },
@@ -12,6 +34,7 @@ const MODE_LABELS = {
 export default function Gate() {
   const [age, setAge] = useState(false);
   const [terms, setTerms] = useState(false);
+  const [checkingConsent, setCheckingConsent] = useState(true);
   const nav = useNavigate();
   const [params] = useSearchParams();
   const setMode = useChat((s) => s.setMode);
@@ -24,13 +47,23 @@ export default function Gate() {
   const modeMeta = MODE_LABELS[initialMode];
   const ok = age && terms;
 
+  useEffect(() => {
+    if (!hasValidConsent()) {
+      setCheckingConsent(false);
+      return;
+    }
+
+    setMode(initialMode);
+    nav("/chat", { replace: true });
+  }, [initialMode, nav, setMode]);
+
   const go = () => {
     if (!ok) return;
 
     setMode(initialMode);
 
     const confirmAge = () => {
-      localStorage.setItem("gulugulu_age_confirmed", "1");
+      localStorage.setItem(CONSENT_KEY, String(Date.now()));
       socket.emit("confirm_age");
     };
     if (socket.connected) {
@@ -53,6 +86,8 @@ export default function Gate() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [ok]);
+
+  if (checkingConsent) return null;
 
   return (
     <div className="min-h-full flex flex-col bg-white text-slate-900">
