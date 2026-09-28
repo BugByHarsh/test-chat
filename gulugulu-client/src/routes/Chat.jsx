@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSocket } from "../hooks/useSocket";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { useMedia } from "../hooks/useMedia";
@@ -29,10 +30,17 @@ export default function Chat() {
   const media = useMedia();
   const webrtc = useWebRTC();
   const skipTimerRef = useRef(null);
+  const navigate = useNavigate();
 
   const [confirmSkip, setConfirmSkip] = useState(false);
 
   useReconnect();
+
+  useEffect(() => {
+    if (localStorage.getItem("gulugulu_age_confirmed") !== "1") {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     document.title = "Gulugulu";
@@ -99,6 +107,11 @@ export default function Chat() {
   };
 
   const onNewClick = () => {
+    if (localStorage.getItem("gulugulu_age_confirmed") !== "1") {
+      navigate("/", { replace: true });
+      return;
+    }
+
     if (status === "searching") return;
 
     setConfirmSkip(false);
