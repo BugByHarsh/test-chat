@@ -87,12 +87,12 @@ export default function Landing() {
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                  <a
-                    href="#modes"
+                  <Link
+                    to="/gate?mode=text"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-lg shadow-blue-200/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
                   >
-                    Text Chat <span aria-hidden="true">↓</span>
-                  </a>
+                    Text Chat <span aria-hidden="true">→</span>
+                  </Link>
                   <a
                     href="#how-it-works"
                     className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:border-slate-300 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
