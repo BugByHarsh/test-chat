@@ -22,8 +22,16 @@ export default function Composer({ onSend, onTyping, disabled, placeholder }) {
     <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
       <input
         ref={inputRef}
-        name="chat-message"
-        autoComplete="off"
+        name="message"
+        type="text"
+        inputMode="text"
+        autoComplete="new-password"
+        autoCorrect="off"
+        autoCapitalize="sentences"
+        spellCheck={true}
+        aria-autocomplete="none"
+        data-lpignore="true"
+        data-1p-ignore="true"
         autoCorrect="off"
         autoCapitalize="sentences"
         spellCheck={true}
