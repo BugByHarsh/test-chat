@@ -1,7 +1,4 @@
-const common = {
-  greeting: { questions: [], replies: ["hey", "hii", "ohh hey", "hey :)"] },
-};
-
+const common = {};
 export const SCRIPTS = [
   {
     id: "riya_delhi",
@@ -33,8 +30,6 @@ export const SCRIPTS = [
         replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
-    acknowledgements: ["ohh", "haha", "nicee", "oh okay", "gotcha"],
-    fillers: ["ohh", "haha", "hmm", "nice"],
   },
   {
     id: "sneha_mumbai",
@@ -66,8 +61,6 @@ export const SCRIPTS = [
         replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
-    acknowledgements: ["ohh", "okay", "nicee", "haha", "gotcha"],
-    fillers: ["ohh", "okay", "nicee", "haha"],
   },
   {
     id: "ananya_bangalore",
@@ -99,8 +92,6 @@ export const SCRIPTS = [
         replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
-    acknowledgements: ["hmm", "ohh", "okay", "nice"],
-    fillers: ["hmm", "ohh", "okay"],
   },
   {
     id: "alex_anon",
@@ -132,8 +123,6 @@ export const SCRIPTS = [
         replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
-    acknowledgements: ["hm", "oh", "okay", "nice"],
-    fillers: ["hm", "oh", "okay"],
   },
   {
     id: "sam_random",
@@ -165,7 +154,5 @@ export const SCRIPTS = [
         replies: ["i like chill people tbh", "just want someone easy to talk to", "someone with a good vibe"],
       },
     },
-    acknowledgements: ["hm", "ohh", "nice", "okay"],
-    fillers: ["hm", "ohh", "nice"],
   },
 ];
