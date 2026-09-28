@@ -32,9 +32,6 @@ export default function Composer({ onSend, onTyping, disabled, placeholder }) {
         aria-autocomplete="none"
         data-lpignore="true"
         data-1p-ignore="true"
-        autoCorrect="off"
-        autoCapitalize="sentences"
-        spellCheck={true}
         value={text}
         disabled={disabled}
         onChange={(e) => {
