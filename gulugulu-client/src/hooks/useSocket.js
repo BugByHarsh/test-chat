@@ -3,6 +3,28 @@ import { socket } from "../lib/socket";
 import { useChat } from "../store/chatStore";
 import { sounds } from "../lib/sounds";
 
+const CONSENT_KEY = "gulugulu_age_confirmed";
+const CONSENT_TTL_MS = 24 * 60 * 60 * 1000;
+
+function hasValidConsent() {
+  const raw = localStorage.getItem(CONSENT_KEY);
+  if (!raw) return false;
+
+  // Migrate the old permanent flag into the new 24-hour format.
+  if (raw === "1") {
+    localStorage.setItem(CONSENT_KEY, String(Date.now()));
+    return true;
+  }
+
+  const acceptedAt = Number(raw);
+  if (!Number.isFinite(acceptedAt) || Date.now() - acceptedAt >= CONSENT_TTL_MS) {
+    localStorage.removeItem(CONSENT_KEY);
+    return false;
+  }
+
+  return true;
+}
+
 export function useSocket() {
   const startedRef = useRef(false);
 
@@ -16,7 +38,7 @@ export function useSocket() {
 
     const onConnect = () => {
       S().setConnected(true);
-      if (localStorage.getItem("gulugulu_age_confirmed") === "1") {
+      if (hasValidConsent()) {
         socket.emit("confirm_age");
       }
     };
