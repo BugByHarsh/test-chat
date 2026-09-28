@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../hooks/useSocket";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { useMedia } from "../hooks/useMedia";
-import { useHotkeys } from "../hooks/useHotkeys";
 import { useReconnect } from "../hooks/useReconnect";
 import { useChat } from "../store/chatStore";
 import MessageList from "../components/MessageList";
@@ -123,17 +122,6 @@ export default function Chat() {
     socketApi.report(reason, frame);
     useChat.getState().showToast("Report sent. Thanks.", "success");
   };
-
-  useHotkeys(
-    {
-      escape: () => {
-        if (status === "chatting") {
-          onSkip();
-        }
-      },
-    },
-    [status, mode, interests, confirmSkip]
-  );
 
   useEffect(() => {
     return () => {
