@@ -91,7 +91,7 @@ export default function Landing() {
                     href="#modes"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-lg shadow-blue-200/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
                   >
-                    Choose a chat mode <span aria-hidden="true">↓</span>
+                    Text Chat <span aria-hidden="true">↓</span>
                   </a>
                   <a
                     href="#how-it-works"
