@@ -121,7 +121,7 @@ export default function Landing() {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="text-emerald-500">✓</span>
-                  No chat logs
+                  No permanent chat logs
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="text-emerald-500">✓</span>
