@@ -52,7 +52,7 @@ export default function MessageList() {
       onScroll={onScroll}
       className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain bg-white px-2 sm:px-3 py-2 space-y-2"
     >
-      <div className="min-h-full flex flex-col justify-end gap-2">
+      <div className="min-h-full flex flex-col justify-end sm:justify-start gap-2">
       {messages.map((m) => {
         if (m.from === "system") {
           return (
