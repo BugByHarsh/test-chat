@@ -22,6 +22,11 @@ export default function Composer({ onSend, onTyping, disabled, placeholder }) {
     <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
       <input
         ref={inputRef}
+        name="chat-message"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="sentences"
+        spellCheck={true}
         value={text}
         disabled={disabled}
         onChange={(e) => {
