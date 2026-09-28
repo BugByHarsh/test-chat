@@ -29,11 +29,11 @@ export default function ReportModal({ onReport }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/40 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-[2px]" role="presentation">
+      <div role="dialog" aria-modal="true" aria-labelledby="report-title" className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4 shadow-2xl shadow-slate-950/20">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-slate-900">Report user</h3>
+            <h3 id="report-title" className="font-semibold text-slate-900">Report user</h3>
             <p className="mt-0.5 text-xs text-slate-400">
               Help keep Gulugulu safe.
             </p>
@@ -42,7 +42,7 @@ export default function ReportModal({ onReport }) {
           <button
             onClick={closeReport}
             aria-label="Close report"
-            className="w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors flex items-center justify-center"
+            className="w-9 h-9 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200 transition-colors flex items-center justify-center"
           >
             ✕
           </button>
@@ -96,7 +96,7 @@ export default function ReportModal({ onReport }) {
         <div className="flex gap-2 pt-1">
           <button
             onClick={closeReport}
-            className="flex-1 py-2.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+            className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200 transition-colors"
           >
             Cancel
           </button>
@@ -104,7 +104,7 @@ export default function ReportModal({ onReport }) {
           <button
             disabled={!reason || busy}
             onClick={submit}
-            className="flex-1 py-2.5 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 active:bg-red-700 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 active:bg-red-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-100 transition-colors"
           >
             {busy ? "Sending…" : "Submit report"}
           </button>
