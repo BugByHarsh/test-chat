@@ -153,7 +153,7 @@ export function useWebRTC() {
       if (failureHandledRef.current) return;
       failureHandledRef.current = true;
       showToast(message, "error");
-      socket.emit("skip");
+      socket.emit("skip", { source: "connection_failure" });
     };
 
     pc.oniceconnectionstatechange = () => {
