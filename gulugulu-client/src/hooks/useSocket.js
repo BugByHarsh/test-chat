@@ -134,11 +134,21 @@ export function useSocket() {
         stream.getTracks().forEach((track) => track.stop());
       }
 
+      const wasSkipped = p.reason === "skipped";
+
       state.resetRoom();
       state.setLocalStream(null);
       state.setMediaError(null);
       state.setMicOn(true);
       state.setCamOn(true);
+
+      // The user who was skipped should automatically look for another
+      // partner. The user who pressed Skip stays idle and can choose New.
+      if (wasSkipped && state.status === "idle") {
+        // The Chat route owns the actual search/media setup. Tell it to
+        // start a fresh search without treating this as a manual Skip.
+        window.dispatchEvent(new CustomEvent("gulugulu:partner-skipped"));
+      }
     };
 
     const randomOnlineCount = () => Math.floor(3000 + Math.random() * 2001);
