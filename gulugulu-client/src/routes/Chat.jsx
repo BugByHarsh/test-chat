@@ -151,7 +151,9 @@ export default function Chat() {
       }
     }
 
-    await startWebRTC();
+    // WebRTC must start only after matchmaking assigns a room and role.
+    // Creating it while searching causes the WebRTC hook to tear it down
+    // immediately because there is no active chat room yet.
     findPartner(requestedMode, currentInterests);
   };
 
