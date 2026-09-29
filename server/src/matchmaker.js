@@ -9,6 +9,7 @@ export function addToQueue(session) {
     sessionId: session.id,
     interests: session.interests.slice(),
     mode: session.mode,
+    searchId: session.searchId,
     joinedAt: Date.now(),
   });
 }
