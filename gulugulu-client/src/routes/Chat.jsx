@@ -177,11 +177,24 @@ export default function Chat() {
         return;
       }
       if (!skipPendingRef.current) return;
+      // Manual Skip ends this user's session. Do not automatically search;
+      // the user who was skipped is the one who should rematch automatically.
       skipPendingRef.current = false;
+    };
+
+    const handlePartnerSkipped = () => {
+      if (leavingRef.current) return;
+      if (useChat.getState().status !== "idle") return;
       beginSearch(useChat.getState().mode);
     };
+
     window.addEventListener("gulugulu:skip-complete", handleSkipComplete);
-    return () => window.removeEventListener("gulugulu:skip-complete", handleSkipComplete);
+    window.addEventListener("gulugulu:partner-skipped", handlePartnerSkipped);
+
+    return () => {
+      window.removeEventListener("gulugulu:skip-complete", handleSkipComplete);
+      window.removeEventListener("gulugulu:partner-skipped", handlePartnerSkipped);
+    };
   }, [mode]);
 
   const onSkip = () => {
