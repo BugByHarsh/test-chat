@@ -27,6 +27,7 @@ function hasValidConsent() {
 
 export function useSocket() {
   const startedRef = useRef(false);
+  const activeSearchIdRef = useRef(null);
 
   useEffect(() => {
     if (!startedRef.current) {
@@ -73,15 +74,23 @@ export function useSocket() {
       }
     };
 
-    const onWaiting = () => S().setStatus("searching");
+    const onWaiting = (p = {}) => {
+      if (!p.searchId || p.searchId !== activeSearchIdRef.current) return;
+      if (S().status !== "searching") return;
+      S().setStatus("searching");
+    };
 
-    const onMatched = (p) => {
+    const onMatched = (p = {}) => {
+      if (!p.searchId || p.searchId !== activeSearchIdRef.current) return;
+      if (S().status !== "searching") return;
       S().setMatched(p);
       sounds.match();
       S().pushSystem("You're now chatting with a stranger.");
     };
 
-    const onMessage = (p) => {
+    const onMessage = (p = {}) => {
+      const state = S();
+      if (state.status !== "chatting" || !state.roomId || p.roomId !== state.roomId) return;
       S().pushMessage({
         id: Math.random().toString(36).slice(2),
         from: "partner",
@@ -90,10 +99,21 @@ export function useSocket() {
       });
     };
 
-    const onTyping = (p) => S().setPartnerTyping(p.isTyping);
+    const onTyping = (p = {}) => {
+      const state = S();
+      if (state.status !== "chatting" || p.roomId !== state.roomId) return;
+      state.setPartnerTyping(p.isTyping);
+    };
 
-    const onVideoReveal = () => S().setRevealRemote(true);
-    const onSkipComplete = () => window.dispatchEvent(new CustomEvent("gulugulu:skip-complete"));
+    const onVideoReveal = (p = {}) => {
+      const state = S();
+      if (state.status !== "chatting" || p.roomId !== state.roomId) return;
+      state.setRevealRemote(true);
+    };
+    const onSkipComplete = (p = {}) => {
+      if (!p.searchId || p.searchId !== activeSearchIdRef.current) return;
+      window.dispatchEvent(new CustomEvent("gulugulu:skip-complete", { detail: p }));
+    };
 
     const onLeft = (p) => {
       const labels = {
@@ -103,6 +123,7 @@ export function useSocket() {
         exited: "Stranger left.",
       };
       const state = S();
+      if (state.status !== "chatting" || !state.roomId || p.roomId !== state.roomId) return;
       state.showToast(labels[p.reason] || "Stranger left.", "info");
 
       // Partner leaving ends our current session too. Stop call media here;
@@ -178,10 +199,13 @@ export function useSocket() {
 
   return {
     findPartner: useCallback((mode, interests) => {
-      socket.emit("find_partner", { mode, interests });
+      const searchId = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`;
+      activeSearchIdRef.current = searchId;
+      socket.emit("find_partner", { mode, interests, searchId });
     }, []),
     cancelSearch: useCallback(() => socket.emit("cancel_search"), []),
     leaveSession: useCallback(() => {
+      activeSearchIdRef.current = null;
       if (socket.connected) {
         socket.emit("leave_session");
       }
