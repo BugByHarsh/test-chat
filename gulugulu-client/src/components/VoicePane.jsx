@@ -92,19 +92,18 @@ export default function VoicePane({ searching = false, searchingNotice = null })
   const speaking = level > 0.08;
 
   return (
-    <div className="relative flex-1 min-h-0 flex flex-col items-center justify-center gap-8 p-6 bg-slate-950 overflow-hidden">
+    <div
+      className={"relative min-h-0 flex flex-col items-center justify-center gap-8 p-6 bg-slate-950 overflow-hidden " + (searching ? "flex-none h-[50%] min-h-[240px] max-h-[520px]" : "flex-1")}
+    >
       <audio ref={remoteAudioRef} autoPlay playsInline data-remote="true" />
 
-      {searching && searchingNotice && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center px-6 text-center bg-slate-950/95">
-          <p className="text-sm font-semibold text-red-400">
-            {searchingNotice}
-          </p>
-        </div>
-      )}
-
       {searching && (
-        <div className="absolute inset-x-0 bottom-8 z-30 flex justify-center">
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 px-6 text-center bg-slate-950">
+          {searchingNotice && (
+            <p className="text-sm font-semibold text-red-400">
+              {searchingNotice}
+            </p>
+          )}
           <SearchingIndicator />
         </div>
       )}
