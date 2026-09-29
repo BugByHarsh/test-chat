@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "../store/chatStore";
+import SearchingIndicator from "./SearchingIndicator";
 
-export default function VideoPane() {
+export default function VideoPane({ searching = false, searchingNotice = null }) {
   const {
     localStream,
     remoteStream,
@@ -100,6 +101,20 @@ export default function VideoPane() {
 
   return (
     <div className="relative flex-none h-[50%] min-h-[240px] max-h-[520px] bg-slate-950 overflow-hidden border-b border-slate-800">
+      {searching && searchingNotice && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center px-6 text-center bg-slate-950/95">
+          <p className="text-sm font-semibold text-red-400">
+            {searchingNotice}
+          </p>
+        </div>
+      )}
+
+      {searching && (
+        <div className="absolute inset-x-0 bottom-8 z-40 flex justify-center">
+          <SearchingIndicator />
+        </div>
+      )}
+
       <video
         ref={remoteRef}
         autoPlay
