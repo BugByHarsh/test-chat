@@ -61,7 +61,7 @@ test("closeRoom is terminal and notifies the remaining human", () => {
     {
       socketId: "test-b",
       event: "partner_left",
-      payload: { reason: "exited" },
+      payload: { reason: "exited", roomId: room.id },
     },
   ]);
 
@@ -100,7 +100,7 @@ test("leave_session ends an active room and is idempotent", () => {
       {
         socketId: "test-leave-b",
         event: "partner_left",
-        payload: { reason: "exited" },
+        payload: { reason: "exited", roomId: room.id },
       },
     ]
   );
@@ -187,6 +187,31 @@ test("skip_complete identifies automatic connection-failure rematches", () => {
       },
     }
   );
+
+  deleteSession(a.id);
+  deleteSession(b.id);
+});
+
+test("connection-failure skip bypasses the manual skip cooldown", () => {
+  const events = [];
+  const io = fakeIo(events);
+
+  const a = createSession({ socketId: "test-fail-cooldown-a", ipHash: "a" });
+  const b = createSession({ socketId: "test-fail-cooldown-b", ipHash: "b" });
+  const room = createRoom(a, b, "voice");
+
+  a.state = b.state = "chatting";
+  a.roomId = b.roomId = room.id;
+  a.searchId = "search-a";
+  b.searchId = "search-b";
+  a.lastSkipAt = Date.now();
+
+  const socket = fakeSocket(a.socketId, events);
+  registerHandlers(io, socket);
+  socket.trigger("skip", { source: "connection_failure" });
+
+  assert.equal(events.some((event) => event.event === "skip_complete"), true);
+  assert.equal(events.some((event) => event.event === "rate_limited"), false);
 
   deleteSession(a.id);
   deleteSession(b.id);
