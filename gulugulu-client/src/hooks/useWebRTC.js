@@ -387,11 +387,27 @@ export function useWebRTC() {
     };
   }, [createPC, flushIce, showToast]);
 
+  // A PeerConnection belongs to a matched room, not to the search phase.
+  // Wait until matchmaking has assigned roomId/role, then create the PC using
+  // the latest local media stream. This prevents the "created -> immediately
+  // torn down while searching -> matched with no PC" race.
   useEffect(() => {
     if (
       status === "chatting" &&
       mode !== "text" &&
-      role === "caller"
+      role &&
+      !pcRef.current
+    ) {
+      start();
+    }
+  }, [status, mode, role, start]);
+
+  useEffect(() => {
+    if (
+      status === "chatting" &&
+      mode !== "text" &&
+      role === "caller" &&
+      pcRef.current
     ) {
       negotiate();
     }
