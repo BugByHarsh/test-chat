@@ -177,9 +177,16 @@ export default function Chat() {
         return;
       }
       if (!skipPendingRef.current) return;
-      // Manual Skip ends this user's session. Do not automatically search;
-      // the user who was skipped is the one who should rematch automatically.
+
+      // The server has already closed the room for the skipper. Synchronize
+      // local state immediately so the UI shows New instead of stale chat UI.
       skipPendingRef.current = false;
+      const state = useChat.getState();
+      state.resetRoom();
+      state.setLocalStream(null);
+      state.setMediaError(null);
+      state.setMicOn(true);
+      state.setCamOn(true);
     };
 
     const handlePartnerSkipped = () => {
