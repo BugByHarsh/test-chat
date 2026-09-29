@@ -177,7 +177,7 @@ export default function Chat() {
       if (leavingRef.current) return;
       if (source === "connection_failure") {
         if (useChat.getState().status !== "chatting") return;
-        beginSearch(useChat.getState().mode, {\n          disconnect: "Stranger has disconnected.",\n          next: "Finding someone new...",\n        });
+        beginSearch(useChat.getState().mode);
         return;
       }
       if (!skipPendingRef.current) return;
@@ -201,7 +201,10 @@ export default function Chat() {
     const handlePartnerSkipped = () => {
       if (leavingRef.current) return;
       if (useChat.getState().status !== "idle") return;
-      beginSearch(useChat.getState().mode);
+      beginSearch(useChat.getState().mode, {
+        disconnect: "Stranger has disconnected.",
+        next: "Finding someone new...",
+      });
     };
 
     window.addEventListener("gulugulu:skip-complete", handleSkipComplete);
