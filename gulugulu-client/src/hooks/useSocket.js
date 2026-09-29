@@ -102,8 +102,21 @@ export function useSocket() {
         timeout: "Stranger left.",
         exited: "Stranger left.",
       };
-      S().showToast(labels[p.reason] || "Stranger left.", "info");
-      S().resetRoom();
+      const state = S();
+      state.showToast(labels[p.reason] || "Stranger left.", "info");
+
+      // Partner leaving ends our current session too. Stop call media here;
+      // Skip initiated by us intentionally keeps media alive for rematching.
+      const stream = state.localStream;
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+
+      state.resetRoom();
+      state.setLocalStream(null);
+      state.setMediaError(null);
+      state.setMicOn(true);
+      state.setCamOn(true);
     };
 
     const randomOnlineCount = () => Math.floor(3000 + Math.random() * 2001);
@@ -168,6 +181,11 @@ export function useSocket() {
       socket.emit("find_partner", { mode, interests });
     }, []),
     cancelSearch: useCallback(() => socket.emit("cancel_search"), []),
+    leaveSession: useCallback(() => {
+      if (socket.connected) {
+        socket.emit("leave_session");
+      }
+    }, []),
     sendMessage: useCallback((text) => socket.emit("message", { text }), []),
     sendTyping: useCallback((isTyping) => socket.emit("typing", { isTyping }), []),
     skip: useCallback(() => socket.emit("skip"), []),
