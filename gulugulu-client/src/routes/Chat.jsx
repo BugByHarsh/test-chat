@@ -52,7 +52,7 @@ export default function Chat() {
     report,
     leaveSession,
   } = useSocket();
-  const media = useMedia();
+  const { request: requestMedia, stop: stopMedia, getStream } = useMedia();
   const { start: startWebRTC, teardown: teardownWebRTC } = useWebRTC();
   const skipTimerRef = useRef(null);
   const leavingRef = useRef(false);
@@ -79,13 +79,13 @@ export default function Chat() {
     if (mode !== "text") {
       teardownWebRTC();
     }
-    media.stop();
+    stopMedia();
 
     state.resetRoom();
     state.setMediaError(null);
     state.setMicOn(true);
     state.setCamOn(true);
-  }, [leaveSession, media, mode, teardownWebRTC]);
+  }, [getStream, leaveSession, mode, stopMedia, teardownWebRTC]);
 
 
   useEffect(() => {
@@ -137,8 +137,8 @@ export default function Chat() {
       return;
     }
 
-    if (!media.getStream()) {
-      const stream = await media.request({
+    if (!getStream()) {
+      const stream = await requestMedia({
         audio: true,
         video: mode === "video",
       });
@@ -222,7 +222,7 @@ export default function Chat() {
   useEffect(() => {
     return () => {
       clearTimeout(skipTimerRef.current);
-      media.stop();
+      stopMedia();
       teardownWebRTC();
     };
 
@@ -309,7 +309,7 @@ export default function Chat() {
             onRetry={beginSearch}
             onSkipCall={() => {
               useChat.getState().setMode("text");
-              media.stop();
+              stopMedia();
 
               setTimeout(() => beginSearch(), 0);
             }}
