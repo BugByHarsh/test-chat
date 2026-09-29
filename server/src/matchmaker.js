@@ -52,7 +52,7 @@ export function findHumanMatch(session, getSession) {
 
   for (const c of candidates) {
     const other = getSession(c.sessionId);
-    if (!other) continue;
+    if (!other || other.state !== "searching" || other.searchId !== c.searchId) continue;
     const overlap = c.interests.filter((i) => session.interests.includes(i)).length;
     const score = overlap * 3 + (now - c.joinedAt) / 1000;
     if (score > bestScore) {
