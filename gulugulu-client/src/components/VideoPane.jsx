@@ -6,8 +6,11 @@ export default function VideoPane() {
     localStream,
     remoteStream,
     camOn,
+    micOn,
     iceState,
     status,
+    setCamOn,
+    setMicOn,
   } = useChat();
 
   const localRef = useRef(null);
@@ -65,7 +68,24 @@ export default function VideoPane() {
   }, [remoteStream, attach]);
 
   const showRemoteVideo = remoteReady;
-  const showLocalPreview = true;
+
+  const toggleMic = () => {
+    if (!localStream) return;
+    const next = !micOn;
+    localStream.getAudioTracks().forEach((track) => {
+      track.enabled = next;
+    });
+    setMicOn(next);
+  };
+
+  const toggleCamera = () => {
+    if (!localStream) return;
+    const next = !camOn;
+    localStream.getVideoTracks().forEach((track) => {
+      track.enabled = next;
+    });
+    setCamOn(next);
+  };
 
   const connection = {
     new: { label: "Preparing video…", tone: "slate" },
@@ -92,7 +112,7 @@ export default function VideoPane() {
         autoPlay
         playsInline
         data-remote="true"
-        className={`w-full h-full object-cover transition-opacity duration-200 ${
+        className={`absolute left-1/2 top-0 h-full w-auto max-w-full -translate-x-1/2 object-contain transition-opacity duration-200 ${
           showRemoteVideo ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -138,13 +158,13 @@ export default function VideoPane() {
       )}
 
       {status === "chatting" && (
-        <div className="absolute top-3 right-3 w-28 sm:w-36 aspect-[3/4] rounded-lg overflow-hidden border border-white/20 bg-slate-900 shadow-lg">
+        <div className="absolute top-3 right-3 w-24 sm:w-28 aspect-[3/4] rounded-lg overflow-hidden border border-white/20 bg-slate-900 shadow-lg">
           <video
             ref={localRef}
             autoPlay
             playsInline
             muted
-            className={`w-full h-full object-cover transition-opacity duration-200 ${
+            className={`w-full h-full object-contain transition-opacity duration-200 ${
               camOn ? "opacity-100" : "opacity-0"
             }`}
           />
@@ -154,6 +174,34 @@ export default function VideoPane() {
               cam off
             </div>
           )}
+        </div>
+      )}
+
+      {status === "chatting" && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/85 px-2 py-1.5 shadow-lg backdrop-blur">
+          <button
+            type="button"
+            onClick={toggleMic}
+            aria-label={micOn ? "Mute microphone" : "Unmute microphone"}
+            title={micOn ? "Mute microphone" : "Unmute microphone"}
+            className={`flex h-9 w-9 items-center justify-center rounded-full text-base transition-colors ${
+              micOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-red-500 text-white"
+            }`}
+          >
+            {micOn ? "🎙️" : "🔇"}
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleCamera}
+            aria-label={camOn ? "Turn camera off" : "Turn camera on"}
+            title={camOn ? "Turn camera off" : "Turn camera on"}
+            className={`flex h-9 w-9 items-center justify-center rounded-full text-base transition-colors ${
+              camOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-red-500 text-white"
+            }`}
+          >
+            {camOn ? "📹" : "🚫"}
+          </button>
         </div>
       )}
 
