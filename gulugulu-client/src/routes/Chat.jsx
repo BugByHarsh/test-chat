@@ -53,7 +53,7 @@ export default function Chat() {
     leaveSession,
   } = useSocket();
   const { request: requestMedia, stop: stopMedia, getStream } = useMedia();
-  const { start: startWebRTC, teardown: teardownWebRTC } = useWebRTC();
+  const { teardown: teardownWebRTC } = useWebRTC();
   const skipTimerRef = useRef(null);
   const leavingRef = useRef(false);
   const skipPendingRef = useRef(false);
