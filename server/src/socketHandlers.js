@@ -96,6 +96,24 @@ export function registerHandlers(io, socket) {
     socket.emit("error", { code: "CANCELLED", message: "Search cancelled." });
   });
 
+  // Leaving the chat page is an intentional terminal session action.
+  // Unlike a transport disconnect, this event is sent while the socket is
+  // still alive so the partner is released immediately.
+  socket.on("leave_session", () => {
+    clearHoldTimer(session.id);
+    removeFromQueue(session.id);
+
+    if (session.state === "chatting" && session.roomId) {
+      closeRoom(io, session, "exited");
+      return;
+    }
+
+    if (session.state === "searching") {
+      session.state = "idle";
+      session.roomId = null;
+    }
+  });
+
   socket.on("message", ({ text } = {}) => {
     if (session.state !== "chatting" || !session.roomId) return;
     if (typeof text !== "string") return;
@@ -244,6 +262,9 @@ export function registerHandlers(io, socket) {
     removeFromQueue(session.id);
     if (session.state === "chatting" && session.roomId) {
       closeRoom(io, session, "disconnected");
+    } else if (session.state === "searching") {
+      session.state = "idle";
+      session.roomId = null;
     }
   });
 }
