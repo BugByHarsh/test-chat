@@ -44,7 +44,14 @@ export default function Chat() {
     mediaPermission,
   } = useChat();
 
-  const socketApi = useSocket();
+  const {
+    findPartner,
+    sendMessage,
+    sendTyping,
+    skip: skipSession,
+    report,
+    leaveSession,
+  } = useSocket();
   const media = useMedia();
   const { start: startWebRTC, teardown: teardownWebRTC } = useWebRTC();
   const skipTimerRef = useRef(null);
@@ -65,7 +72,7 @@ export default function Chat() {
     setConfirmSkip(false);
 
     // End the server-side session first while the socket is still alive.
-    socketApi.leaveSession();
+    leaveSession();
 
     // Back/refresh/navigation is a real session end, unlike Skip which
     // intentionally keeps media alive for immediate rematching.
@@ -78,7 +85,7 @@ export default function Chat() {
     state.setMediaError(null);
     state.setMicOn(true);
     state.setCamOn(true);
-  }, [media, mode, socketApi, teardownWebRTC]);
+  }, [leaveSession, media, mode, teardownWebRTC]);
 
 
   useEffect(() => {
@@ -126,7 +133,7 @@ export default function Chat() {
     S.startSearching();
 
     if (mode === "text") {
-      socketApi.findPartner("text", currentInterests);
+      findPartner("text", currentInterests);
       return;
     }
 
@@ -143,7 +150,7 @@ export default function Chat() {
     }
 
     await startWebRTC();
-    socketApi.findPartner(mode, currentInterests);
+    findPartner(mode, currentInterests);
   };
 
   const performSkip = () => {
@@ -154,7 +161,7 @@ export default function Chat() {
       teardownWebRTC();
     }
 
-    socketApi.skip();
+    skipSession();
   };
 
   useEffect(() => {
@@ -201,11 +208,11 @@ export default function Chat() {
       ts: Date.now(),
     });
 
-    socketApi.sendMessage(text);
+    sendMessage(text);
   };
 
   const doReport = (reason, frame) => {
-    socketApi.report(reason, frame);
+    report(reason, frame);
     useChat.getState().showToast("Report sent. Thanks.", "success");
   };
 
@@ -344,7 +351,7 @@ export default function Chat() {
             <div className="flex-1 min-w-0">
               <Composer
                 onSend={onSend}
-                onTyping={socketApi.sendTyping}
+                onTyping={sendTyping}
                 disabled={!isChatting}
                 placeholder={
                   isChatting
