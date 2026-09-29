@@ -125,7 +125,7 @@ export function useSocket() {
       };
       const state = S();
       if (state.status !== "chatting" || !state.roomId || p.roomId !== state.roomId) return;
-      state.showToast(labels[p.reason] || "Stranger left.", "info");
+      if (p.reason === "skipped") {\n        state.showToast("Stranger has disconnected.", "disconnect");\n        state.showToast("Finding someone new...", "info");\n      } else {\n        state.showToast(labels[p.reason] || "Stranger left.", "info");\n      }
 
       // Partner leaving ends our current session too. Stop call media here;
       // Skip initiated by us intentionally keeps media alive for rematching.
