@@ -328,12 +328,14 @@ export function closeRoom(io, leaverSession, reason) {
   const roomId = leaverSession.roomId;
   if (!roomId) {
     leaverSession.roomId = null;
+    leaverSession.role = null;
     leaverSession.state = "idle";
     return;
   }
   const room = getRoom(roomId);
   if (!room) {
     leaverSession.roomId = null;
+    leaverSession.role = null;
     leaverSession.state = "idle";
     return;
   }
@@ -343,6 +345,7 @@ export function closeRoom(io, leaverSession, reason) {
 
   if (partnerSession) {
     partnerSession.roomId = null;
+    partnerSession.role = null;
     partnerSession.state = "idle";
     if (isBot(partnerSession)) {
       destroyBot(partnerSession.id);
@@ -352,6 +355,7 @@ export function closeRoom(io, leaverSession, reason) {
   }
 
   leaverSession.roomId = null;
+  leaverSession.role = null;
   leaverSession.state = "idle";
   deleteRoom(roomId);
 }
