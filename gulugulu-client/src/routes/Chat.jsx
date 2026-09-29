@@ -163,12 +163,19 @@ export default function Chat() {
     }
 
     skipPendingRef.current = true;
-    skipSession();
+    skipSession("user");
   };
 
   useEffect(() => {
-    const handleSkipComplete = () => {
-      if (leavingRef.current || !skipPendingRef.current) return;
+    const handleSkipComplete = (event) => {
+      const source = event.detail?.source || "user";
+      if (leavingRef.current) return;
+      if (source === "connection_failure") {
+        if (useChat.getState().status !== "chatting") return;
+        beginSearch(useChat.getState().mode);
+        return;
+      }
+      if (!skipPendingRef.current) return;
       skipPendingRef.current = false;
       beginSearch(useChat.getState().mode);
     };
