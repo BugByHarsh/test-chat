@@ -74,12 +74,11 @@ export default function Chat() {
 
     // End the server-side session first while the socket is still alive.
     leaveSession();
+    skipPendingRef.current = false;
 
-    // Back/refresh/navigation is a real session end, unlike Skip which
-    // intentionally keeps media alive for immediate rematching.
-    if (mode !== "text") {
-      teardownWebRTC();
-    }
+    // Back/refresh/navigation is a real session end. Teardown is safe for
+    // text mode too and prevents stale call state if the mode changed.
+    teardownWebRTC();
     stopMedia();
 
     state.resetRoom();
@@ -97,9 +96,10 @@ export default function Chat() {
 
   useEffect(() => {
     const requestedMode = searchParams.get("mode");
-    if (requestedMode === "text" || requestedMode === "voice" || requestedMode === "video") {
-      useChat.getState().setMode(requestedMode);
-    }
+    const nextMode = ["text", "voice", "video"].includes(requestedMode)
+      ? requestedMode
+      : "text";
+    useChat.getState().setMode(nextMode);
   }, [searchParams]);
 
   useEffect(() => {
