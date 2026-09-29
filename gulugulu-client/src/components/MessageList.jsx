@@ -57,7 +57,13 @@ export default function MessageList() {
         if (m.from === "system") {
           return (
             <div key={m.id} className="flex justify-center my-3">
-              <span className="text-[11px] text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
+              <span
+                className={
+                  m.kind === "disconnect"
+                    ? "text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-3 py-1.5 rounded-full"
+                    : "text-xs text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full"
+                }
+              >
                 {m.text}
               </span>
             </div>
