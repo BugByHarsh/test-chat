@@ -327,6 +327,8 @@ function finalizeBotMatch(io, room, a, b) {
       if (human) {
         human.state = "idle";
         human.roomId = null;
+        human.role = null;
+        human.searchId = null;
         io.to(human.socketId).emit("partner_left", { reason, roomId: room.id });
       }
       destroyBot(b.session.id);
