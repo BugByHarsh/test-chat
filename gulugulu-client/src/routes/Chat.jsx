@@ -42,7 +42,6 @@ export default function Chat() {
     pushMessage,
     openReport,
     mediaPermission,
-    searchNotice,
   } = useChat();
 
   const {
