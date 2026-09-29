@@ -46,7 +46,7 @@ export default function Chat() {
 
   const socketApi = useSocket();
   const media = useMedia();
-  const webrtc = useWebRTC();
+  const { start: startWebRTC, teardown: teardownWebRTC } = useWebRTC();
   const skipTimerRef = useRef(null);
   const leavingRef = useRef(false);
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ export default function Chat() {
     // Back/refresh/navigation is a real session end, unlike Skip which
     // intentionally keeps media alive for immediate rematching.
     if (mode !== "text") {
-      webrtc.teardown();
+      teardownWebRTC();
     }
     media.stop();
 
@@ -78,7 +78,7 @@ export default function Chat() {
     state.setMediaError(null);
     state.setMicOn(true);
     state.setCamOn(true);
-  }, [media, mode, socketApi, webrtc]);
+  }, [media, mode, socketApi, teardownWebRTC]);
 
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export default function Chat() {
       }
     }
 
-    await webrtc.start();
+    await startWebRTC();
     socketApi.findPartner(mode, currentInterests);
   };
 
@@ -151,7 +151,7 @@ export default function Chat() {
     setConfirmSkip(false);
 
     if (mode !== "text") {
-      webrtc.teardown();
+      teardownWebRTC();
     }
 
     socketApi.skip();
@@ -213,7 +213,7 @@ export default function Chat() {
     return () => {
       clearTimeout(skipTimerRef.current);
       media.stop();
-      webrtc.teardown();
+      teardownWebRTC();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
