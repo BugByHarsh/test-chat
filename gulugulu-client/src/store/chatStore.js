@@ -19,6 +19,7 @@ export const useChat = create((set) => ({
 
   onlineCount: 0,
   toasts: [],
+  searchNotice: null,
   reportOpen: false,
 
   localStream: null,
@@ -65,6 +66,7 @@ export const useChat = create((set) => ({
     })),
 
   setStatus: (status) => set({ status }),
+  setSearchNotice: (searchNotice) => set({ searchNotice }),
   setOnlineCount: (onlineCount) => set({ onlineCount }),
   setPartnerTyping: (partnerTyping) => set({ partnerTyping }),
 
@@ -155,6 +157,7 @@ export const useChat = create((set) => ({
   resetRoom: () =>
     set({
       status: "idle",
+      searchNotice: null,
       roomId: null,
       partnerType: null,
       role: null,
