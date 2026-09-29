@@ -132,7 +132,14 @@ export default function Chat() {
     const currentInterests = S.interests;
 
     S.startSearching();
-    S.setSearchNotice(notice);
+
+    // A partner skip is a real conversation event. Keep it in the message
+    // history while the automatic rematch is running so the UI does not
+    // look like it silently reset.
+    if (notice?.disconnect) {
+      S.pushSystem(notice.disconnect, "disconnect");
+      if (notice.next) S.pushSystem(notice.next, "info");
+    }
 
     if (requestedMode === "text") {
       findPartner("text", currentInterests);
@@ -318,18 +325,11 @@ export default function Chat() {
 
     if (isSearching) {
       return (
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-4 px-4">
-          {searchNotice && (
-            <div className="w-full max-w-sm text-center space-y-2">
-              <div className="text-sm font-semibold text-red-700">
-                {searchNotice.disconnect}
-              </div>
-              <div className="text-sm text-slate-500">
-                {searchNotice.next}
-              </div>
-            </div>
-          )}
-          <SearchingIndicator />
+        <div className="flex-1 min-h-0 flex flex-col">
+          <MessageList />
+          <div className="shrink-0 flex justify-center px-4 pb-3">
+            <SearchingIndicator />
+          </div>
         </div>
       );
     }
