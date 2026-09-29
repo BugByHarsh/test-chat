@@ -335,10 +335,16 @@ export default function Chat() {
         );
       }
 
+      const searchingNotice = useChat.getState().messages.at(-1)?.text;
+
       return (
         <div className="flex-1 min-h-0 flex items-center justify-center px-4">
-          <div className="text-center">
-            <MessageList />
+          <div className="text-center space-y-4">
+            {searchingNotice && (
+              <p className="text-sm font-semibold text-red-700">
+                {searchingNotice}
+              </p>
+            )}
             <SearchingIndicator />
           </div>
         </div>
