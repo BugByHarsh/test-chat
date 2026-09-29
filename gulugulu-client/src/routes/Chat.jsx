@@ -185,7 +185,12 @@ export default function Chat() {
       skipPendingRef.current = false;
       const state = useChat.getState();
       state.resetRoom();
-      state.setLocalStream(null);
+
+      // Keep the live local media stream when the user who pressed Skip
+      // returns to idle. useMedia owns the same stream in its ref, and New
+      // should reuse it instead of leaving Zustand null while the media ref
+      // still points at a live stream. Otherwise the next search can skip
+      // getUserMedia(), then create the new PeerConnection with no tracks.
       state.setMediaError(null);
       state.setMicOn(true);
       state.setCamOn(true);
