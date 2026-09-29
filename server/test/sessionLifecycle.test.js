@@ -154,6 +154,48 @@ test("matchmaker ignores a stale queue entry after a search cycle changes", asyn
   deleteSession(b.id);
 });
 
+test("manual skip leaves skipper idle and notifies partner as skipped", () => {
+  const events = [];
+  const io = fakeIo(events);
+
+  const a = createSession({ socketId: "test-skip-a", ipHash: "a" });
+  const b = createSession({ socketId: "test-skip-b", ipHash: "b" });
+  const room = createRoom(a, b, "text");
+
+  a.state = b.state = "chatting";
+  a.roomId = b.roomId = room.id;
+  a.searchId = "search-a";
+  b.searchId = "search-b";
+
+  const socket = fakeSocket(a.socketId, events);
+  registerHandlers(io, socket);
+  socket.trigger("skip", { source: "user" });
+
+  assert.equal(a.state, "idle");
+  assert.equal(a.roomId, null);
+  assert.equal(b.state, "idle");
+  assert.equal(b.roomId, null);
+  assert.deepEqual(
+    events.filter((event) => event.event === "partner_left"),
+    [{
+      socketId: b.socketId,
+      event: "partner_left",
+      payload: { reason: "skipped", roomId: room.id },
+    }]
+  );
+  assert.deepEqual(
+    events.find((event) => event.event === "skip_complete"),
+    {
+      socketId: a.socketId,
+      event: "skip_complete",
+      payload: { roomId: room.id, searchId: "search-a", source: "user" },
+    }
+  );
+
+  deleteSession(a.id);
+  deleteSession(b.id);
+});
+
 test("skip_complete identifies automatic connection-failure rematches", () => {
   const events = [];
   const io = fakeIo(events);
