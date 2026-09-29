@@ -323,10 +323,22 @@ export default function Chat() {
     }
 
     if (isSearching) {
+      if (mode === "voice") {
+        return (
+          <VoicePane searching searchingNotice={useChat.getState().messages.at(-1)?.text} />
+        );
+      }
+
+      if (mode === "video") {
+        return (
+          <VideoPane searching searchingNotice={useChat.getState().messages.at(-1)?.text} />
+        );
+      }
+
       return (
-        <div className="flex-1 min-h-0 flex flex-col">
-          <MessageList />
-          <div className="shrink-0 flex justify-center px-4 pb-3">
+        <div className="flex-1 min-h-0 flex items-center justify-center px-4">
+          <div className="text-center">
+            <MessageList />
             <SearchingIndicator />
           </div>
         </div>
