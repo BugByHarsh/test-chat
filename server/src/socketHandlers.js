@@ -100,17 +100,26 @@ export function registerHandlers(io, socket) {
   // Unlike a transport disconnect, this event is sent while the socket is
   // still alive so the partner is released immediately.
   socket.on("leave_session", () => {
+    const wasChatting = session.state === "chatting" && !!session.roomId;
+    const wasSearching = session.state === "searching";
+
+    // Mark the session terminal before clearing the queue so a hold timer
+    // racing with this event cannot finalize a new match.
+    if (wasChatting || wasSearching) {
+      session.state = "leaving";
+    }
+
     clearHoldTimer(session.id);
     removeFromQueue(session.id);
 
-    if (session.state === "chatting" && session.roomId) {
+    if (wasChatting) {
       closeRoom(io, session, "exited");
       return;
     }
 
-    if (session.state === "searching") {
-      session.state = "idle";
+    if (wasSearching) {
       session.roomId = null;
+      session.state = "idle";
     }
   });
 
