@@ -87,24 +87,6 @@ export default function VideoPane() {
     setCamOn(next);
   };
 
-  const connection = {
-    new: { label: "Preparing video…", tone: "slate" },
-    checking: { label: "Connecting…", tone: "blue" },
-    connected: { label: "Connected", tone: "emerald" },
-    completed: { label: "Connected", tone: "emerald" },
-    disconnected: { label: "Reconnecting…", tone: "amber" },
-    failed: { label: "Connection failed", tone: "red" },
-    closed: { label: "Call ended", tone: "slate" },
-  }[iceState] || { label: "Connecting…", tone: "blue" };
-
-  const connectionTone = {
-    slate: "bg-slate-900/80 text-slate-300 border-slate-700",
-    blue: "bg-blue-950/80 text-blue-200 border-blue-800",
-    emerald: "bg-emerald-950/80 text-emerald-200 border-emerald-800",
-    amber: "bg-amber-950/80 text-amber-200 border-amber-800",
-    red: "bg-red-950/80 text-red-200 border-red-800",
-  }[connection.tone];
-
   return (
     <div className="relative flex-none h-[50%] min-h-[240px] max-h-[520px] bg-slate-950 overflow-hidden border-b border-slate-800">
       <video
@@ -205,22 +187,6 @@ export default function VideoPane() {
         </div>
       )}
 
-      {status === "chatting" && (
-        <div className={`absolute bottom-2 left-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium ${connectionTone}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${
-            connection.tone === "emerald"
-              ? "bg-emerald-400"
-              : connection.tone === "red"
-                ? "bg-red-400"
-                : connection.tone === "amber"
-                  ? "bg-amber-400 animate-pulse"
-                  : connection.tone === "blue"
-                    ? "bg-blue-400 animate-pulse"
-                    : "bg-slate-400"
-          }`} />
-          {connection.label}
-        </div>
-      )}
     </div>
   );
 }
