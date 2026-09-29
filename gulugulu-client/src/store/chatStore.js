@@ -83,11 +83,11 @@ export const useChat = create((set) => ({
 
   pushMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
 
-  pushSystem: (text) =>
+  pushSystem: (text, kind = "info") =>
     set((s) => ({
       messages: [
         ...s.messages,
-        { id: uid(), from: "system", text, ts: Date.now() },
+        { id: uid(), from: "system", text, kind, ts: Date.now() },
       ],
     })),
 
