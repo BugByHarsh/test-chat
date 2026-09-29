@@ -212,7 +212,7 @@ export function useSocket() {
     }, []),
     sendMessage: useCallback((text) => socket.emit("message", { text }), []),
     sendTyping: useCallback((isTyping) => socket.emit("typing", { isTyping }), []),
-    skip: useCallback(() => socket.emit("skip"), []),
+    skip: useCallback((source = "user") => socket.emit("skip", { source }), []),
     report: useCallback((reason, frame) => {
       socket.emit("report", { reason, frame });
     }, []),
