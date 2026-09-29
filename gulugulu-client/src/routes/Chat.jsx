@@ -233,12 +233,23 @@ export default function Chat() {
   useEffect(() => {
     return () => {
       clearTimeout(skipTimerRef.current);
+
+      // Route unmounts (including browser Back) must end the server-side
+      // session too. Otherwise the socket survives the route change and the
+      // server can keep this client in the matchmaking queue.
+      const state = useChat.getState();
+      if (state.status === "chatting" || state.status === "searching") {
+        leaveSession();
+        state.resetRoom();
+        state.setMediaError(null);
+        state.setMicOn(true);
+        state.setCamOn(true);
+      }
+
       stopMedia();
       teardownWebRTC();
     };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [leaveSession, stopMedia, teardownWebRTC]);
 
   const isChatting = status === "chatting";
   const isSearching = status === "searching";
