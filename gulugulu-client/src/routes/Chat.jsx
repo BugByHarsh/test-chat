@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSocket } from "../hooks/useSocket";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { useMedia } from "../hooks/useMedia";
-import { useReconnect } from "../hooks/useReconnect";
 import { useChat } from "../store/chatStore";
 import MessageList from "../components/MessageList";
 import Composer from "../components/Composer";
@@ -49,12 +48,38 @@ export default function Chat() {
   const media = useMedia();
   const webrtc = useWebRTC();
   const skipTimerRef = useRef(null);
+  const leavingRef = useRef(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [confirmSkip, setConfirmSkip] = useState(false);
 
-  useReconnect();
+  const leaveCurrentSession = useCallback(() => {
+    if (leavingRef.current) return;
+
+    const state = useChat.getState();
+    if (state.status !== "chatting" && state.status !== "searching") return;
+
+    leavingRef.current = true;
+    clearTimeout(skipTimerRef.current);
+    setConfirmSkip(false);
+
+    // End the server-side session first while the socket is still alive.
+    socketApi.leaveSession();
+
+    // Back/refresh/navigation is a real session end, unlike Skip which
+    // intentionally keeps media alive for immediate rematching.
+    if (mode !== "text") {
+      webrtc.teardown();
+    }
+    media.stop();
+
+    state.resetRoom();
+    state.setMediaError(null);
+    state.setMicOn(true);
+    state.setCamOn(true);
+  }, [media, mode, socketApi, webrtc]);
+
 
   useEffect(() => {
     if (!hasValidConsent()) {
@@ -70,10 +95,31 @@ export default function Chat() {
   }, [searchParams]);
 
   useEffect(() => {
+    const handleBack = () => {
+      leaveCurrentSession();
+    };
+
+    const handlePageExit = () => {
+      leaveCurrentSession();
+    };
+
+    window.addEventListener("popstate", handleBack);
+    window.addEventListener("pagehide", handlePageExit);
+    window.addEventListener("beforeunload", handlePageExit);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+      window.removeEventListener("pagehide", handlePageExit);
+      window.removeEventListener("beforeunload", handlePageExit);
+    };
+  }, [leaveCurrentSession]);
+
+  useEffect(() => {
     document.title = "Gulugulu";
   }, []);
 
   const beginSearch = async () => {
+    leavingRef.current = false;
     const S = useChat.getState();
     const currentInterests = S.interests;
 
