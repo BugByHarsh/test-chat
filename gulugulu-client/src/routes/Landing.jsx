@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Seo from "../components/Seo";
 
 const MODES = [
   {
@@ -47,7 +48,9 @@ const STEPS = [
 
 export default function Landing() {
   return (
-    <div className="min-h-full flex flex-col bg-white text-slate-900">
+    <>
+      <Seo />
+      <div className="min-h-full flex flex-col bg-white text-slate-900">
       <header className="sticky top-0 z-30 w-full border-b border-slate-100 bg-white/95 backdrop-blur">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group" aria-label="Gulugulu home">
@@ -197,6 +200,7 @@ export default function Landing() {
           </nav>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
