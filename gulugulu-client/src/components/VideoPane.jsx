@@ -69,6 +69,17 @@ export default function VideoPane() {
 
   const showRemoteVideo = remoteReady;
 
+  const connectionLabel = {
+    new: "Preparing video…",
+    checking: "Connecting…",
+    connected: "Connected",
+    completed: "Connected",
+    disconnected: "Reconnecting…",
+    failed: "Connection failed",
+    closed: "Call ended",
+  }[iceState] || "Connecting…";
+
+
   const toggleMic = () => {
     if (!localStream) return;
     const next = !micOn;
@@ -110,7 +121,7 @@ export default function VideoPane() {
               </div>
 
               <div className="space-y-1">
-                <p className="text-sm text-slate-300">{connection.label}</p>
+                <p className="text-sm text-slate-300">{connectionLabel}</p>
                 <p className="text-[11px] text-slate-500">
                   {remoteReady ? "Video stream received" : "Waiting for stranger's camera…"}
                 </p>
