@@ -37,5 +37,9 @@ export function relayRTC(io, session, event, payload) {
     return;
   }
 
-  io.to(partnerSession.socketId).emit(event, payload);
+  io.to(partnerSession.socketId).emit(event, {
+    ...payload,
+    roomId: room.id,
+    searchId: partnerSession.searchId,
+  });
 }
