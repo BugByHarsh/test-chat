@@ -109,6 +109,10 @@ export function useMedia() {
       return null;
     }
 
+    // streamRef is the media hook's live source of truth. Keep Zustand
+    // synchronized with it before WebRTC consumes the stream, so a previous
+    // session cannot leave localStream null while a live stream is reusable.
+    setLocalStream(stream);
     return stream;
   }, [setLocalStream]);
 
