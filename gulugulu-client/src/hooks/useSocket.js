@@ -118,7 +118,7 @@ export function useSocket() {
 
     const onLeft = (p) => {
       const labels = {
-        skipped: "Stranger skipped.",
+        skipped: "Stranger has disconnected.",
         disconnected: "Stranger disconnected.",
         timeout: "Stranger left.",
         exited: "Stranger left.",
