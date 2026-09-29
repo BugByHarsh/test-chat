@@ -33,6 +33,7 @@ export function createSession({ socketId, ipHash }) {
     ageConfirmed: false,
     createdAt: Date.now(),
     bot: null, // bot state when this session is a bot
+    searchId: null,
   };
   sessions.set(id, session);
   bySocket.set(socketId, id);
