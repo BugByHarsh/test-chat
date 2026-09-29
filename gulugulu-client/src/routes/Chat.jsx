@@ -42,6 +42,7 @@ export default function Chat() {
     pushMessage,
     openReport,
     mediaPermission,
+    searchNotice,
   } = useChat();
 
   const {
@@ -126,12 +127,13 @@ export default function Chat() {
     document.title = "Gulugulu";
   }, []);
 
-  const beginSearch = async (requestedMode = useChat.getState().mode) => {
+  const beginSearch = async (requestedMode = useChat.getState().mode, notice = null) => {
     leavingRef.current = false;
     const S = useChat.getState();
     const currentInterests = S.interests;
 
     S.startSearching();
+    S.setSearchNotice(notice);
 
     if (requestedMode === "text") {
       findPartner("text", currentInterests);
@@ -175,7 +177,7 @@ export default function Chat() {
       if (leavingRef.current) return;
       if (source === "connection_failure") {
         if (useChat.getState().status !== "chatting") return;
-        beginSearch(useChat.getState().mode);
+        beginSearch(useChat.getState().mode, {\n          disconnect: "Stranger has disconnected.",\n          next: "Finding someone new...",\n        });
         return;
       }
       if (!skipPendingRef.current) return;
@@ -314,7 +316,17 @@ export default function Chat() {
 
     if (isSearching) {
       return (
-        <div className="flex-1 min-h-0 flex items-center justify-center">
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-4 px-4">
+          {searchNotice && (
+            <div className="w-full max-w-sm text-center space-y-2">
+              <div className="text-sm font-semibold text-red-700">
+                {searchNotice.disconnect}
+              </div>
+              <div className="text-sm text-slate-500">
+                {searchNotice.next}
+              </div>
+            </div>
+          )}
           <SearchingIndicator />
         </div>
       );
