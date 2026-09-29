@@ -138,7 +138,6 @@ export default function Chat() {
     // look like it silently reset.
     if (notice?.disconnect) {
       S.pushSystem(notice.disconnect, "disconnect");
-      if (notice.next) S.pushSystem(notice.next, "info");
     }
 
     if (requestedMode === "text") {
