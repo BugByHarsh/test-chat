@@ -165,7 +165,10 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    const handleSkipComplete = () => beginSearch();
+    const handleSkipComplete = () => {
+      if (leavingRef.current) return;
+      beginSearch();
+    };
     window.addEventListener("gulugulu:skip-complete", handleSkipComplete);
     return () => window.removeEventListener("gulugulu:skip-complete", handleSkipComplete);
   }, [mode]);
