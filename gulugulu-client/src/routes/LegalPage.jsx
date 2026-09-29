@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import Seo from "../components/Seo";
 
 const CONTENT = {
   terms: {
@@ -44,7 +45,9 @@ export default function LegalPage() {
   const page = CONTENT[pathname.slice(1)] || CONTENT.safety;
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-50/70 text-slate-900">
+    <>
+      <Seo />
+      <div className="min-h-full flex flex-col bg-slate-50/70 text-slate-900">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 font-bold tracking-tight">
@@ -110,6 +113,7 @@ export default function LegalPage() {
           <Link to="/" className="hover:text-slate-900 transition-colors">Back to home</Link>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
