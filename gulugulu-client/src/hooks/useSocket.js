@@ -144,9 +144,9 @@ export function useSocket() {
 
       // The user who was skipped should automatically look for another
       // partner. The user who pressed Skip stays idle and can choose New.
-      if (wasSkipped && state.status === "idle") {
-        // The Chat route owns the actual search/media setup. Tell it to
-        // start a fresh search without treating this as a manual Skip.
+      if (wasSkipped) {
+        // resetRoom() just changed the store to idle; do not read the stale
+        // snapshot captured before that mutation.
         window.dispatchEvent(new CustomEvent("gulugulu:partner-skipped"));
       }
     };
