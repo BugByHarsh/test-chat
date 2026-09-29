@@ -106,7 +106,7 @@ export default function VideoPane() {
   }[connection.tone];
 
   return (
-    <div className="relative flex-none h-[40%] min-h-[220px] max-h-[420px] bg-slate-950 overflow-hidden border-b border-slate-800">
+    <div className="relative flex-none h-[50%] min-h-[240px] max-h-[520px] bg-slate-950 overflow-hidden border-b border-slate-800">
       <video
         ref={remoteRef}
         autoPlay
@@ -158,7 +158,7 @@ export default function VideoPane() {
       )}
 
       {status === "chatting" && (
-        <div className="absolute top-3 right-3 w-24 sm:w-28 aspect-[3/4] rounded-lg overflow-hidden border border-white/20 bg-slate-900 shadow-lg">
+        <div className="absolute top-3 right-3 w-20 sm:w-24 aspect-[3/4] rounded-lg overflow-hidden border border-white/20 bg-slate-900 shadow-lg">
           <video
             ref={localRef}
             autoPlay
@@ -170,7 +170,7 @@ export default function VideoPane() {
           />
 
           {!camOn && (
-            <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-400 bg-slate-900">
+            <div className="absolute inset-0 flex items-center justify-center text-[10px] text-slate-400 bg-slate-900">
               cam off
             </div>
           )}
@@ -178,13 +178,13 @@ export default function VideoPane() {
       )}
 
       {status === "chatting" && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/85 px-2 py-1.5 shadow-lg backdrop-blur">
+        <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 rounded-full border border-white/10 bg-slate-950/85 px-1.5 py-1 shadow-lg backdrop-blur">
           <button
             type="button"
             onClick={toggleMic}
             aria-label={micOn ? "Mute microphone" : "Unmute microphone"}
             title={micOn ? "Mute microphone" : "Unmute microphone"}
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-base transition-colors ${
+            className={`flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors ${
               micOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-red-500 text-white"
             }`}
           >
@@ -196,7 +196,7 @@ export default function VideoPane() {
             onClick={toggleCamera}
             aria-label={camOn ? "Turn camera off" : "Turn camera on"}
             title={camOn ? "Turn camera off" : "Turn camera on"}
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-base transition-colors ${
+            className={`flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors ${
               camOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-red-500 text-white"
             }`}
           >
