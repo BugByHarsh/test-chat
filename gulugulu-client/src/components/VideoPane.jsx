@@ -101,16 +101,13 @@ export default function VideoPane({ searching = false, searchingNotice = null })
 
   return (
     <div className="relative flex-none h-[50%] min-h-[240px] max-h-[520px] bg-slate-950 overflow-hidden border-b border-slate-800">
-      {searching && searchingNotice && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center px-6 text-center bg-slate-950/95">
-          <p className="text-sm font-semibold text-red-400">
-            {searchingNotice}
-          </p>
-        </div>
-      )}
-
       {searching && (
-        <div className="absolute inset-x-0 bottom-8 z-40 flex justify-center">
+        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 px-6 text-center bg-slate-950">
+          {searchingNotice && (
+            <p className="text-sm font-semibold text-red-400">
+              {searchingNotice}
+            </p>
+          )}
           <SearchingIndicator />
         </div>
       )}
@@ -125,7 +122,7 @@ export default function VideoPane({ searching = false, searchingNotice = null })
         }`}
       />
 
-      {!showRemoteVideo && (
+      {!searching && !showRemoteVideo && (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center bg-slate-950">
           {!remoteReady ? (
             <div className="space-y-3">
