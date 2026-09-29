@@ -98,6 +98,7 @@ export function registerHandlers(io, socket) {
     removeFromQueue(session.id);
     clearHoldTimer(session.id);
     session.state = "idle";
+    session.searchId = null;
     socket.emit("error", { code: "CANCELLED", message: "Search cancelled." });
   });
 
@@ -208,7 +209,7 @@ export function registerHandlers(io, socket) {
     io.to(partnerSession.socketId).emit("video_reveal", { roomId: session.roomId });
   });
 
-  socket.on("skip", () => {
+  socket.on("skip", ({ source = "user" } = {}) => {
     if (session.state !== "chatting" || !session.roomId) return;
     const rl = checkSkipCooldown(session, config.skipCooldownMs);
     if (!rl.ok) {
@@ -222,7 +223,7 @@ export function registerHandlers(io, socket) {
     const skippedRoomId = session.roomId;
     const searchId = session.searchId;
     closeRoom(io, session, "skipped");
-    socket.emit("skip_complete", { roomId: skippedRoomId, searchId });
+    socket.emit("skip_complete", { roomId: skippedRoomId, searchId, source });
     inc("skips");
   });
 
@@ -318,7 +319,7 @@ function finalizeBotMatch(io, room, a, b) {
   startBot({
     sessionId: b.session.id,
     emit: (text) => {
-      io.to(a.session.socketId).emit("message", { text, ts: Date.now() });
+      io.to(a.session.socketId).emit("message", { text, ts: Date.now(), roomId: room.id });
     },
     onExit: (reason) => {
       // Bots never send a goodbye/exit message.
