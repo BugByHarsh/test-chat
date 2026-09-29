@@ -211,14 +211,16 @@ export function registerHandlers(io, socket) {
 
   socket.on("skip", ({ source = "user" } = {}) => {
     if (session.state !== "chatting" || !session.roomId) return;
-    const rl = checkSkipCooldown(session, config.skipCooldownMs);
-    if (!rl.ok) {
-      socket.emit("rate_limited", {
-        code: "SKIP_COOLDOWN",
-        message: "Too many skips.",
-        retryAfter: rl.retryAfter,
-      });
-      return;
+    if (source !== "connection_failure") {
+      const rl = checkSkipCooldown(session, config.skipCooldownMs);
+      if (!rl.ok) {
+        socket.emit("rate_limited", {
+          code: "SKIP_COOLDOWN",
+          message: "Too many skips.",
+          retryAfter: rl.retryAfter,
+        });
+        return;
+      }
     }
     const skippedRoomId = session.roomId;
     const searchId = session.searchId;
