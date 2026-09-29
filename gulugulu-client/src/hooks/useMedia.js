@@ -91,7 +91,26 @@ export function useMedia() {
     setCamOn(next);
   }, [camOn, setCamOn]);
 
-  const getStream = useCallback(() => streamRef.current, []);
+  const getStream = useCallback((requirements = {}) => {
+    const stream = streamRef.current;
+    if (!stream) return null;
+
+    const liveTracks = stream.getTracks().filter((track) => track.readyState === "live");
+    const needsAudio = requirements.audio === true;
+    const needsVideo = requirements.video === true;
+
+    const hasAudio = !needsAudio || liveTracks.some((track) => track.kind === "audio");
+    const hasVideo = !needsVideo || liveTracks.some((track) => track.kind === "video");
+
+    if (!hasAudio || !hasVideo) {
+      liveTracks.forEach((track) => track.stop());
+      streamRef.current = null;
+      setLocalStream(null);
+      return null;
+    }
+
+    return stream;
+  }, [setLocalStream]);
 
   return { request, stop, toggleMic, toggleCam, getStream };
 }
