@@ -11,6 +11,13 @@ export function useMedia() {
   const request = useCallback(
     async (opts) => {
       try {
+        const previous = streamRef.current;
+        if (previous) {
+          previous.getTracks().forEach((t) => t.stop());
+          streamRef.current = null;
+          setLocalStream(null);
+        }
+
         if (!navigator.mediaDevices?.getUserMedia) {
           setMediaPermission("unavailable");
           setMediaError("Your browser does not support camera/microphone.");
@@ -50,6 +57,8 @@ export function useMedia() {
           setMediaPermission("denied");
           setMediaError(e?.message || "Could not access media.");
         }
+        streamRef.current = null;
+        setLocalStream(null);
         updateWebRTCDebug({ lastError: `${name || "MediaError"}: ${e?.message || "Could not access media."}`, lastEvent: `media: ${name || "error"}` });
         return null;
       }
