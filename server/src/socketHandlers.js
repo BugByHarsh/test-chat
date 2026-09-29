@@ -29,7 +29,7 @@ export function registerHandlers(io, socket) {
     session.ageConfirmed = true;
   });
 
-  socket.on("find_partner", ({ mode, interests } = {}) => {
+  socket.on("find_partner", ({ mode, interests, searchId } = {}) => {
     if (!canStartSearch(session)) {
       socket.emit("error", {
         code: "AGE_REQUIRED",
@@ -41,6 +41,10 @@ export function registerHandlers(io, socket) {
     if (!["text", "voice", "video"].includes(mode)) mode = "text";
     if (!Array.isArray(interests)) interests = [];
     interests = interests.filter((i) => typeof i === "string").slice(0, 5);
+    if (typeof searchId !== "string" || searchId.length < 8 || searchId.length > 128) {
+      socket.emit("error", { code: "BAD_SEARCH", message: "Invalid search request." });
+      return;
+    }
 
     if (session.state !== "idle") {
       socket.emit("error", { code: "BAD_STATE", message: "Already in a session." });
@@ -49,9 +53,10 @@ export function registerHandlers(io, socket) {
 
     session.mode = mode;
     session.interests = interests;
+    session.searchId = searchId;
     session.state = "searching";
 
-    socket.emit("waiting", { position: queueSize() + 1 });
+    socket.emit("waiting", { position: queueSize() + 1, searchId });
 
     const match = findHumanMatch(session, S);
     if (match) {
@@ -64,7 +69,7 @@ export function registerHandlers(io, socket) {
     setHoldTimer(
       session.id,
       () => {
-        if (session.state !== "searching") return;
+        if (session.state !== "searching" || session.searchId !== searchId) return;
 
         const late = findHumanMatch(session, S);
         if (late) {
@@ -82,7 +87,7 @@ export function registerHandlers(io, socket) {
           }
         }
 
-        socket.emit("waiting", { position: queueSize() });
+        socket.emit("waiting", { position: queueSize(), searchId });
       },
       config.holdTimerMs
     );
@@ -111,6 +116,7 @@ export function registerHandlers(io, socket) {
 
     clearHoldTimer(session.id);
     removeFromQueue(session.id);
+    session.searchId = null;
 
     if (wasChatting) {
       closeRoom(io, session, "exited");
@@ -160,7 +166,7 @@ export function registerHandlers(io, socket) {
     const partnerSession = S(partner.sessionId);
     if (!partnerSession) return;
 
-    io.to(partnerSession.socketId).emit("message", { text, ts: Date.now() });
+    io.to(partnerSession.socketId).emit("message", { text, ts: Date.now(), roomId: session.roomId });
 
     if (isBot(partnerSession)) {
       botOnUserMessage({
@@ -168,7 +174,7 @@ export function registerHandlers(io, socket) {
         text,
         emit: (reply) => {
           pushRoomMessage(room, partnerSession.id, reply);
-          io.to(session.socketId).emit("message", { text: reply, ts: Date.now() });
+          io.to(session.socketId).emit("message", { text: reply, ts: Date.now(), roomId: room.id });
         },
       });
     }
@@ -184,7 +190,7 @@ export function registerHandlers(io, socket) {
     if (!partner) return;
     const partnerSession = S(partner.sessionId);
     if (!partnerSession || isBot(partnerSession)) return;
-    io.to(partnerSession.socketId).emit("partner_typing", { isTyping: !!isTyping });
+    io.to(partnerSession.socketId).emit("partner_typing", { isTyping: !!isTyping, roomId: session.roomId });
   });
 
   socket.on("video_reveal", () => {
@@ -199,7 +205,7 @@ export function registerHandlers(io, socket) {
     const partnerSession = S(partner.sessionId);
     if (!partnerSession || isBot(partnerSession) || partnerSession.mode !== "video") return;
 
-    io.to(partnerSession.socketId).emit("video_reveal");
+    io.to(partnerSession.socketId).emit("video_reveal", { roomId: session.roomId });
   });
 
   socket.on("skip", () => {
@@ -213,8 +219,10 @@ export function registerHandlers(io, socket) {
       });
       return;
     }
+    const skippedRoomId = session.roomId;
+    const searchId = session.searchId;
     closeRoom(io, session, "skipped");
-    socket.emit("skip_complete");
+    socket.emit("skip_complete", { roomId: skippedRoomId, searchId });
     inc("skips");
   });
 
@@ -269,6 +277,7 @@ export function registerHandlers(io, socket) {
   socket.on("disconnect", () => {
     clearHoldTimer(session.id);
     removeFromQueue(session.id);
+    session.searchId = null;
     if (session.state === "chatting" && session.roomId) {
       closeRoom(io, session, "disconnected");
     } else if (session.state === "searching") {
@@ -285,12 +294,14 @@ function finalizeHumanMatch(io, match) {
     partnerType: b.session.type,
     role: a.role,
     mode: room.mode,
+    searchId: a.session.searchId,
   });
   io.to(b.session.socketId).emit("matched", {
     roomId: room.id,
     partnerType: a.session.type,
     role: b.role,
     mode: room.mode,
+    searchId: b.session.searchId,
   });
   inc("matchesHuman");
 }
@@ -301,6 +312,7 @@ function finalizeBotMatch(io, room, a, b) {
     partnerType: "bot",
     role: a.role,
     mode: room.mode,
+    searchId: a.session.searchId,
   });
 
   startBot({
@@ -314,7 +326,7 @@ function finalizeBotMatch(io, room, a, b) {
       if (human) {
         human.state = "idle";
         human.roomId = null;
-        io.to(human.socketId).emit("partner_left", { reason });
+        io.to(human.socketId).emit("partner_left", { reason, roomId: room.id });
       }
       destroyBot(b.session.id);
       deleteRoom(room.id);
@@ -350,7 +362,7 @@ export function closeRoom(io, leaverSession, reason) {
     if (isBot(partnerSession)) {
       destroyBot(partnerSession.id);
     } else {
-      io.to(partnerSession.socketId).emit("partner_left", { reason });
+      io.to(partnerSession.socketId).emit("partner_left", { reason, roomId });
     }
   }
 
