@@ -17,7 +17,9 @@ export default function Toasts() {
           key={t.id}
           onClick={() => dismissToast(t.id)}
           className={`px-4 py-3 rounded-xl text-sm cursor-pointer shadow-lg border backdrop-blur ${
-            t.kind === "error"
+            t.kind === "disconnect"
+              ? "bg-red-50/95 border-red-200 text-red-800 font-semibold"
+              : t.kind === "error"
               ? "bg-red-50/95 border-red-200 text-red-800"
               : t.kind === "success"
               ? "bg-emerald-50/95 border-emerald-200 text-emerald-800"
