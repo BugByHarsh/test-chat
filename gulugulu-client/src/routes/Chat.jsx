@@ -138,7 +138,8 @@ export default function Chat() {
       return;
     }
 
-    if (!getStream()) {
+    const requiredMedia = { audio: true, video: requestedMode === "video" };
+    if (!getStream(requiredMedia)) {
       const stream = await requestMedia({
         audio: true,
         video: requestedMode === "video",
