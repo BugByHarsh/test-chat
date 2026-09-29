@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChat } from "../store/chatStore";
+import SearchingIndicator from "./SearchingIndicator";
 
-export default function VoicePane() {
+export default function VoicePane({ searching = false, searchingNotice = null }) {
   const { remoteStream, micOn, iceState, status } = useChat();
   const remoteAudioRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -93,6 +94,20 @@ export default function VoicePane() {
   return (
     <div className="relative flex-1 min-h-0 flex flex-col items-center justify-center gap-8 p-6 bg-slate-950 overflow-hidden">
       <audio ref={remoteAudioRef} autoPlay playsInline data-remote="true" />
+
+      {searching && searchingNotice && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center px-6 text-center bg-slate-950/95">
+          <p className="text-sm font-semibold text-red-400">
+            {searchingNotice}
+          </p>
+        </div>
+      )}
+
+      {searching && (
+        <div className="absolute inset-x-0 bottom-8 z-30 flex justify-center">
+          <SearchingIndicator />
+        </div>
+      )}
 
       <div className="relative">
         {speaking && (
