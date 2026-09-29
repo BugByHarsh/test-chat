@@ -27,6 +27,7 @@ export function useWebRTC() {
   const failureHandledRef = useRef(false);
   const restartTimerRef = useRef(null);
   const remoteStreamRef = useRef(null);
+  const roomIdRef = useRef(null);
 
   const {
     status,
@@ -87,6 +88,7 @@ export function useWebRTC() {
       lastEvent: "pc: teardown",
     });
     remoteStreamRef.current = null;
+    roomIdRef.current = null;
     iceRestartedRef.current = false;
     failureHandledRef.current = false;
     setRemoteStream(null);
@@ -98,6 +100,9 @@ export function useWebRTC() {
 
     resetWebRTCDebug();
 
+    const currentRoomId = useChat.getState().roomId;
+    roomIdRef.current = currentRoomId;
+
     const pc = new RTCPeerConnection({
       iceServers: ICE_SERVERS,
       iceCandidatePoolSize: 4,
@@ -108,6 +113,7 @@ export function useWebRTC() {
         updateWebRTCDebug({ iceSent: useChat.getState().webrtcDebug.iceSent + 1, lastEvent: "ICE: candidate sent" });
         socket.emit("webrtc_ice", {
           candidate: event.candidate.toJSON(),
+          roomId: roomIdRef.current,
         });
       }
     };
@@ -188,6 +194,7 @@ export function useWebRTC() {
 
             socket.emit("webrtc_offer", {
               sdp: pc.localDescription,
+              roomId: roomIdRef.current,
             });
           } catch (error) {
             console.error("[WebRTC] ICE restart failed", error);
@@ -294,6 +301,7 @@ export function useWebRTC() {
       updateWebRTCDebug({ offersSent: useChat.getState().webrtcDebug.offersSent + 1, signalingState: pc.signalingState, lastEvent: "signal: offer sent" });
       socket.emit("webrtc_offer", {
         sdp: pc.localDescription,
+        roomId: roomIdRef.current,
       });
     } catch (error) {
       console.error("[WebRTC] Failed to create offer", error);
@@ -302,7 +310,8 @@ export function useWebRTC() {
   }, [showToast]);
 
   useEffect(() => {
-    const onOffer = async ({ sdp }) => {
+    const onOffer = async ({ sdp, roomId }) => {
+      if (!roomId || roomId !== useChat.getState().roomId) return;
       updateWebRTCDebug({ offersReceived: useChat.getState().webrtcDebug.offersReceived + 1, lastEvent: "signal: offer received" });
       if (roleRef.current !== "callee") return;
 
@@ -334,7 +343,8 @@ export function useWebRTC() {
       }
     };
 
-    const onAnswer = async ({ sdp }) => {
+    const onAnswer = async ({ sdp, roomId }) => {
+      if (!roomId || roomId !== useChat.getState().roomId) return;
       updateWebRTCDebug({ answersReceived: useChat.getState().webrtcDebug.answersReceived + 1, lastEvent: "signal: answer received" });
       const pc = pcRef.current;
       if (!pc || roleRef.current !== "caller") return;
@@ -348,8 +358,8 @@ export function useWebRTC() {
       }
     };
 
-    const onIce = async ({ candidate }) => {
-      if (!candidate) return;
+    const onIce = async ({ candidate, roomId }) => {
+      if (!candidate || !roomId || roomId !== useChat.getState().roomId) return;
       updateWebRTCDebug({ iceReceived: useChat.getState().webrtcDebug.iceReceived + 1, lastEvent: "ICE: candidate received" });
 
       const pc = pcRef.current;
