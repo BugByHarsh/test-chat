@@ -127,3 +127,67 @@ test("leave_session removes a searching user before a match can be finalized", (
 
   deleteSession(a.id);
 });
+
+
+test("matchmaker ignores a stale queue entry after a search cycle changes", async () => {
+  const { findHumanMatch, addToQueue, removeFromQueue } = await import("../src/matchmaker.js");
+
+  const a = createSession({ socketId: "test-stale-a", ipHash: "a" });
+  const b = createSession({ socketId: "test-stale-b", ipHash: "b" });
+
+  a.state = "searching";
+  a.mode = "text";
+  a.searchId = "current-a";
+  b.state = "searching";
+  b.mode = "text";
+  b.searchId = "current-b";
+
+  addToQueue(b);
+  b.searchId = "new-b";
+
+  const match = findHumanMatch(a, (id) => id === a.id ? a : id === b.id ? b : undefined);
+  assert.equal(match, null);
+
+  removeFromQueue(a.id);
+  removeFromQueue(b.id);
+  deleteSession(a.id);
+  deleteSession(b.id);
+});
+
+test("skip_complete identifies automatic connection-failure rematches", () => {
+  const events = [];
+  const io = fakeIo(events);
+
+  const a = createSession({ socketId: "test-fail-a", ipHash: "a" });
+  const b = createSession({ socketId: "test-fail-b", ipHash: "b" });
+  a.ageConfirmed = true;
+  b.ageConfirmed = true;
+
+  const room = createRoom(a, b, "voice");
+  a.state = "chatting";
+  a.roomId = room.id;
+  a.searchId = "search-a";
+  b.state = "chatting";
+  b.roomId = room.id;
+  b.searchId = "search-b";
+
+  const socket = fakeSocket(a.socketId, events);
+  registerHandlers(io, socket);
+  socket.trigger("skip", { source: "connection_failure" });
+
+  assert.deepEqual(
+    events.find((event) => event.event === "skip_complete"),
+    {
+      socketId: a.socketId,
+      event: "skip_complete",
+      payload: {
+        roomId: room.id,
+        searchId: "search-a",
+        source: "connection_failure",
+      },
+    }
+  );
+
+  deleteSession(a.id);
+  deleteSession(b.id);
+});
