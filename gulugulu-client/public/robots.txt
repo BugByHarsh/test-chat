@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /gate
+Disallow: /chat
+
+Sitemap: https://www.guluguluchat.in/sitemap.xml
