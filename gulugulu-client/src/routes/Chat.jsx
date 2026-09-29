@@ -56,6 +56,7 @@ export default function Chat() {
   const { start: startWebRTC, teardown: teardownWebRTC } = useWebRTC();
   const skipTimerRef = useRef(null);
   const leavingRef = useRef(false);
+  const skipPendingRef = useRef(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -85,7 +86,7 @@ export default function Chat() {
     state.setMediaError(null);
     state.setMicOn(true);
     state.setCamOn(true);
-  }, [getStream, leaveSession, mode, stopMedia, teardownWebRTC]);
+  }, [leaveSession, mode, stopMedia, teardownWebRTC]);
 
 
   useEffect(() => {
@@ -125,14 +126,14 @@ export default function Chat() {
     document.title = "Gulugulu";
   }, []);
 
-  const beginSearch = async () => {
+  const beginSearch = async (requestedMode = useChat.getState().mode) => {
     leavingRef.current = false;
     const S = useChat.getState();
     const currentInterests = S.interests;
 
     S.startSearching();
 
-    if (mode === "text") {
+    if (requestedMode === "text") {
       findPartner("text", currentInterests);
       return;
     }
@@ -140,7 +141,7 @@ export default function Chat() {
     if (!getStream()) {
       const stream = await requestMedia({
         audio: true,
-        video: mode === "video",
+        video: requestedMode === "video",
       });
 
       if (!stream) {
@@ -150,7 +151,7 @@ export default function Chat() {
     }
 
     await startWebRTC();
-    findPartner(mode, currentInterests);
+    findPartner(requestedMode, currentInterests);
   };
 
   const performSkip = () => {
@@ -161,13 +162,15 @@ export default function Chat() {
       teardownWebRTC();
     }
 
+    skipPendingRef.current = true;
     skipSession();
   };
 
   useEffect(() => {
     const handleSkipComplete = () => {
-      if (leavingRef.current) return;
-      beginSearch();
+      if (leavingRef.current || !skipPendingRef.current) return;
+      skipPendingRef.current = false;
+      beginSearch(useChat.getState().mode);
     };
     window.addEventListener("gulugulu:skip-complete", handleSkipComplete);
     return () => window.removeEventListener("gulugulu:skip-complete", handleSkipComplete);
@@ -311,7 +314,7 @@ export default function Chat() {
               useChat.getState().setMode("text");
               stopMedia();
 
-              setTimeout(() => beginSearch(), 0);
+              setTimeout(() => beginSearch("text"), 0);
             }}
           />
         )}
