@@ -1,0 +1,25 @@
+name: Keep Render Free Service Warm
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render health endpoint
+        env:
+          RENDER_HEALTH_URL: ${{ vars.RENDER_HEALTH_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$RENDER_HEALTH_URL" ]; then
+            echo "RENDER_HEALTH_URL is not configured."
+            exit 1
+          fi
+
+          echo "Pinging $RENDER_HEALTH_URL"
+          curl --fail --silent --show-error --max-time 30 "$RENDER_HEALTH_URL"
+          echo
