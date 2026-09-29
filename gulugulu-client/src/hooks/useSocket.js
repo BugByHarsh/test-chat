@@ -49,6 +49,7 @@ export function useSocket() {
 
     const onDisconnect = (reason) => {
       const state = S();
+      activeSearchIdRef.current = null;
 
       state.setConnected(false);
       state.updateWebRTCDebug({
