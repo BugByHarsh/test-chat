@@ -7,7 +7,7 @@ if (!URL) console.warn("[socket] VITE_SERVER_URL not set");
 export const socket = io(URL, {
   autoConnect: false,
   transports: ["websocket"],
-  // A disconnected chat session is terminal. Do not resurrect an old session.
-  reconnection: false,
+  // Reconnect the Socket.IO transport after an unexpected network drop, without restoring the old chat/session.
+  reconnection: true,
   timeout: 10000,
 });
