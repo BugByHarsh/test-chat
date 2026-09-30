@@ -48,13 +48,16 @@ export default function VoicePane({ searching = false, searchingNotice = null })
     const src = ctx.createMediaStreamSource(remoteStream);
     const analyser = ctx.createAnalyser();
 
-    analyser.fftSize = 512;
+    // Voice quality does not need a 60fps visualizer. Sampling at 10Hz
+    // keeps the UI responsive and avoids unnecessary React renders while
+    // the browser is already decoding the live audio stream.
+    analyser.fftSize = 256;
     src.connect(analyser);
 
     const data = new Uint8Array(analyser.frequencyBinCount);
-    let raf;
+    let timer;
 
-    const tick = () => {
+    const sample = () => {
       analyser.getByteFrequencyData(data);
 
       let sum = 0;
@@ -63,13 +66,13 @@ export default function VoicePane({ searching = false, searchingNotice = null })
       }
 
       setLevel(sum / data.length / 255);
-      raf = requestAnimationFrame(tick);
     };
 
-    tick();
+    sample();
+    timer = window.setInterval(sample, 100);
 
     return () => {
-      cancelAnimationFrame(raf);
+      window.clearInterval(timer);
       try {
         src.disconnect();
       } catch {}
