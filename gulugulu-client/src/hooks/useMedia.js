@@ -27,9 +27,21 @@ export function useMedia() {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: opts.audio,
           video: opts.video
-            ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
+            ? {
+                width: { ideal: 640, max: 640 },
+                height: { ideal: 480, max: 480 },
+                frameRate: { ideal: 24, max: 30 },
+                facingMode: "user",
+              }
             : false,
         });
+        stream.getAudioTracks().forEach((track) => {
+          if ("contentHint" in track) track.contentHint = "speech";
+        });
+        stream.getVideoTracks().forEach((track) => {
+          if ("contentHint" in track) track.contentHint = "motion";
+        });
+
         streamRef.current = stream;
         setLocalStream(stream);
         setMediaPermission("granted");
