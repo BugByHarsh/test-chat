@@ -1,8 +1,6 @@
 import { useEffect, useCallback, useRef } from "react";
 import { socket } from "../lib/socket";
 import { useChat } from "../store/chatStore";
-import { sounds } from "../lib/sounds";
-
 const CONSENT_KEY = "gulugulu_age_confirmed";
 const CONSENT_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -85,7 +83,6 @@ export function useSocket() {
       if (!p.searchId || p.searchId !== activeSearchIdRef.current) return;
       if (S().status !== "searching") return;
       S().setMatched(p);
-      sounds.match();
       S().pushSystem("You're now chatting with a stranger.");
     };
 
