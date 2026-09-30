@@ -105,7 +105,7 @@ export function useWebRTC() {
 
     const pc = new RTCPeerConnection({
       iceServers: ICE_SERVERS,
-      iceCandidatePoolSize: 4,
+      iceCandidatePoolSize: 2,
     });
 
     pc.onicecandidate = (event) => {
@@ -245,7 +245,31 @@ export function useWebRTC() {
     const currentLocalStream = useChat.getState().localStream;
     if (currentLocalStream) {
       currentLocalStream.getTracks().forEach((track) => {
-        pc.addTrack(track, currentLocalStream);
+        const sender = pc.addTrack(track, currentLocalStream);
+
+        // Let the browser adapt video bitrate under congestion instead of
+        // allowing an unnecessarily high encode rate. Audio remains under
+        // the browser's Opus rate controller.
+        if (track.kind === "video") {
+          try {
+            const parameters = sender.getParameters();
+            const encodings = parameters.encodings?.length
+              ? parameters.encodings
+              : [{}];
+
+            encodings.forEach((encoding) => {
+              encoding.maxBitrate = 650_000;
+              encoding.maxFramerate = 24;
+            });
+
+            parameters.encodings = encodings;
+            if ("degradationPreference" in parameters) {
+              parameters.degradationPreference = "maintain-framerate";
+            }
+
+            void sender.setParameters(parameters).catch(() => {});
+          } catch {}
+        }
       });
     }
 
